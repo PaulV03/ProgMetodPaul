@@ -15,7 +15,7 @@ package it.unicam.cs.mpgc.rpg123442.model.character;
 public abstract class AbstractCombattente implements Combattente {
 
     private final String nome;
-    private final Statistiche statistiche;
+    private Statistiche statistiche;
     private int vitaCorrente;
 
     protected AbstractCombattente(String nome, Statistiche statistiche) {
@@ -58,5 +58,27 @@ public abstract class AbstractCombattente implements Combattente {
         }
         // La vita non scende mai sotto zero: Math.max fa da "pavimento".
         this.vitaCorrente = Math.max(0, this.vitaCorrente - danno);
+    }
+
+    /**
+     * Sostituisce le statistiche del combattente.
+     *
+     * <p>E' {@code protected}: solo le sottoclassi possono usarlo, ed e' pensato
+     * per i combattenti che fanno <b>evolvere</b> le proprie statistiche nel
+     * tempo (per esempio l'{@link Eroe} che sale di livello). I combattenti
+     * "normali" non lo usano e le loro statistiche restano di fatto costanti.
+     */
+    protected void setStatistiche(Statistiche statistiche) {
+        if (statistiche == null) {
+            throw new IllegalArgumentException("Le statistiche non possono essere null");
+        }
+        this.statistiche = statistiche;
+    }
+
+    /**
+     * Riporta la vita corrente al massimo consentito dalle statistiche attuali.
+     */
+    protected void ripristinaVitaAlMassimo() {
+        this.vitaCorrente = statistiche.getVitaMassima();
     }
 }

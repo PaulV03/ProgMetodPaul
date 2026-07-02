@@ -36,5 +36,16 @@ public class App {
         System.out.println("--------------------------------------------------");
         combattimento.getVincitore()
                 .ifPresent(v -> System.out.println("Vincitore: " + v.getNome()));
+
+        // Se l'eroe sopravvive, guadagna l'esperienza rilasciata dal nemico.
+        if (eroe.isVivo()) {
+            eroe.guadagnaEsperienza(goblin.getEsperienzaRilasciata());
+            System.out.printf("%s guadagna %d XP  ->  livello %d (%d/%d al prossimo livello)%n",
+                    eroe.getNome(),
+                    goblin.getEsperienzaRilasciata(),
+                    eroe.getLivello(),
+                    eroe.getEsperienza(),
+                    eroe.esperienzaProssimoLivello());
+        }
     }
 }
