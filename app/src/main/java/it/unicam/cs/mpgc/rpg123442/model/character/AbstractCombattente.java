@@ -60,6 +60,18 @@ public abstract class AbstractCombattente implements Combattente {
         this.vitaCorrente = Math.max(0, this.vitaCorrente - danno);
     }
 
+    @Override
+    public void curati(int quantita) {
+        if (quantita < 0) {
+            throw new IllegalArgumentException("La cura non puo' essere negativa");
+        }
+        if (!isVivo()) {
+            return; // un combattente sconfitto non si cura
+        }
+        // La vita non supera mai il massimo: Math.min fa da "tetto".
+        this.vitaCorrente = Math.min(statistiche.getVitaMassima(), this.vitaCorrente + quantita);
+    }
+
     /**
      * Sostituisce le statistiche del combattente.
      *

@@ -1,5 +1,7 @@
 package it.unicam.cs.mpgc.rpg123442.model.character;
 
+import it.unicam.cs.mpgc.rpg123442.model.item.Inventario;
+
 /**
  * Il personaggio controllato dal giocatore.
  *
@@ -16,11 +18,17 @@ public class Eroe extends AbstractCombattente {
 
     private int livello;
     private int esperienza;
+    private final Inventario inventario;
 
     public Eroe(String nome, Statistiche statistiche) {
         super(nome, statistiche);
         this.livello = 1;
         this.esperienza = 0;
+        this.inventario = new Inventario();
+    }
+
+    public Inventario getInventario() {
+        return inventario;
     }
 
     public int getLivello() {

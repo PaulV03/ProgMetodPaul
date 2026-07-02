@@ -37,4 +37,12 @@ public interface Combattente {
      * @param danno quantita' di danno da subire (non negativa)
      */
     void subisciDanno(int danno);
+
+    /**
+     * Ripristina punti vita al combattente, senza superare la vita massima.
+     * Non ha effetto su un combattente gia' sconfitto.
+     *
+     * @param quantita punti vita da recuperare (non negativa)
+     */
+    void curati(int quantita);
 }

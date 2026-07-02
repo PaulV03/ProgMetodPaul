@@ -63,4 +63,33 @@ class AbstractCombattenteTest {
     void statisticheNulleLancianoEccezione() {
         assertThrows(IllegalArgumentException.class, () -> new Eroe("Aragorn", null));
     }
+
+    @Test
+    @DisplayName("curati recupera vita ma non oltre il massimo")
+    void curatiRecuperaVitaSenzaSuperareIlMassimo() {
+        Eroe e = nuovoEroe();
+        e.subisciDanno(15);   // 30 -> 15
+        e.curati(10);
+        assertEquals(25, e.getVitaCorrente());
+        e.curati(1000);       // non supera la vita massima
+        assertEquals(30, e.getVitaCorrente());
+    }
+
+    @Test
+    @DisplayName("curati negativo -> eccezione")
+    void curatiNegativoLanciaEccezione() {
+        Eroe e = nuovoEroe();
+        assertThrows(IllegalArgumentException.class, () -> e.curati(-1));
+    }
+
+    @Test
+    @DisplayName("curati non riporta in vita un combattente sconfitto")
+    void curatiNonRianimaUnMorto() {
+        Eroe e = nuovoEroe();
+        e.subisciDanno(1000); // muore
+        assertFalse(e.isVivo());
+        e.curati(50);
+        assertEquals(0, e.getVitaCorrente());
+        assertFalse(e.isVivo());
+    }
 }
