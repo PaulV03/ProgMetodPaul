@@ -1,5 +1,8 @@
 package it.unicam.cs.mpgc.rpg123442.model.world;
 
+import it.unicam.cs.mpgc.rpg123442.model.character.Nemico;
+import it.unicam.cs.mpgc.rpg123442.model.character.Statistiche;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -74,5 +77,36 @@ class StanzaTest {
 
         assertThrows(UnsupportedOperationException.class,
                 () -> atrio.getDirezioniDisponibili().add(Direzione.SUD));
+    }
+
+    @Test
+    @DisplayName("una stanza creata senza nemico e' libera")
+    void stanzaSenzaNemico() {
+        Stanza atrio = new Stanza("Atrio", "L'ingresso del castello");
+
+        assertFalse(atrio.haNemico());
+        assertTrue(atrio.getNemico().isEmpty());
+    }
+
+    @Test
+    @DisplayName("una stanza puo' essere sorvegliata da un nemico")
+    void stanzaConNemico() {
+        Nemico goblin = new Nemico("Goblin", new Statistiche(20, 5, 1), 10);
+        Stanza tana = new Stanza("Tana", "Una tana buia", goblin);
+
+        assertTrue(tana.haNemico());
+        assertEquals(goblin, tana.getNemico().orElseThrow());
+    }
+
+    @Test
+    @DisplayName("rimuovere il nemico rende la stanza libera")
+    void rimuoviNemico() {
+        Nemico goblin = new Nemico("Goblin", new Statistiche(20, 5, 1), 10);
+        Stanza tana = new Stanza("Tana", "Una tana buia", goblin);
+
+        tana.rimuoviNemico();
+
+        assertFalse(tana.haNemico());
+        assertTrue(tana.getNemico().isEmpty());
     }
 }
