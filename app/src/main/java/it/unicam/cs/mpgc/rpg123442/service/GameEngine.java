@@ -120,4 +120,32 @@ public class GameEngine {
         }
         return eroeVincitore;
     }
+
+    /**
+     * @return true se nel mondo non e' rimasto piu' alcun nemico da sconfiggere
+     */
+    public boolean tuttiNemiciSconfitti() {
+        return mondo.getStanze().stream().noneMatch(Stanza::haNemico);
+    }
+
+    /**
+     * Determina lo stato complessivo della partita.
+     *
+     * <p>L'ordine dei controlli conta: se l'eroe e' morto la partita e' persa,
+     * anche se restassero nemici. Solo se l'eroe e' vivo ha senso chiedersi se ha
+     * gia' ripulito il mondo.
+     *
+     * @return {@link StatoPartita#SCONFITTA} se l'eroe e' caduto,
+     *         {@link StatoPartita#VITTORIA} se ha sconfitto tutti i nemici,
+     *         {@link StatoPartita#IN_CORSO} altrimenti
+     */
+    public StatoPartita statoPartita() {
+        if (!eroe.isVivo()) {
+            return StatoPartita.SCONFITTA;
+        }
+        if (tuttiNemiciSconfitti()) {
+            return StatoPartita.VITTORIA;
+        }
+        return StatoPartita.IN_CORSO;
+    }
 }

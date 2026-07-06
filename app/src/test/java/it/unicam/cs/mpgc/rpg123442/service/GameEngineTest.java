@@ -127,4 +127,45 @@ class GameEngineTest {
     void combattiSenzaNemico() {
         assertThrows(IllegalStateException.class, () -> engine.combatti());
     }
+
+    @Test
+    @DisplayName("con un nemico ancora vivo la partita e' IN_CORSO")
+    void partitaInCorso() {
+        Eroe eroe = new Eroe("Aragorn", new Statistiche(30, 8, 3));
+        Nemico goblin = new Nemico("Goblin", new Statistiche(20, 5, 1), 10);
+        Stanza tana = new Stanza("Tana", "Una tana buia", goblin);
+        GameEngine engine = new GameEngine(eroe, new Mondo(tana));
+
+        assertFalse(engine.tuttiNemiciSconfitti());
+        assertEquals(StatoPartita.IN_CORSO, engine.statoPartita());
+    }
+
+    @Test
+    @DisplayName("sconfitto l'ultimo nemico la partita e' VITTORIA")
+    void partitaVinta() {
+        Eroe eroe = new Eroe("Aragorn", new Statistiche(30, 8, 3));
+        Nemico goblin = new Nemico("Goblin", new Statistiche(20, 5, 1), 10);
+        Stanza tana = new Stanza("Tana", "Una tana buia", goblin);
+        GameEngine engine = new GameEngine(eroe, new Mondo(tana));
+
+        engine.combatti(); // l'eroe forte vince e libera la stanza
+
+        assertTrue(engine.tuttiNemiciSconfitti());
+        assertEquals(StatoPartita.VITTORIA, engine.statoPartita());
+    }
+
+    @Test
+    @DisplayName("se l'eroe cade la partita e' SCONFITTA, anche con nemici rimasti")
+    void partitaPersa() {
+        Eroe novizio = new Eroe("Novizio", new Statistiche(10, 1, 0));
+        Nemico drago = new Nemico("Drago", new Statistiche(50, 20, 5), 100);
+        Stanza covo = new Stanza("Covo", "Il covo del drago", drago);
+        GameEngine engine = new GameEngine(novizio, new Mondo(covo));
+
+        engine.combatti(); // il novizio perde e muore
+
+        assertFalse(novizio.isVivo());
+        assertFalse(engine.tuttiNemiciSconfitti()); // il drago e' ancora li'
+        assertEquals(StatoPartita.SCONFITTA, engine.statoPartita());
+    }
 }
