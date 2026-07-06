@@ -1,6 +1,7 @@
 package it.unicam.cs.mpgc.rpg123442.service;
 
 import it.unicam.cs.mpgc.rpg123442.model.character.Eroe;
+import it.unicam.cs.mpgc.rpg123442.model.character.Nemico;
 import it.unicam.cs.mpgc.rpg123442.model.character.Statistiche;
 import it.unicam.cs.mpgc.rpg123442.model.world.Direzione;
 import it.unicam.cs.mpgc.rpg123442.model.world.Mondo;
@@ -88,5 +89,42 @@ class GameEngineTest {
     @DisplayName("muovere con direzione null -> eccezione")
     void muoviConNull() {
         assertThrows(IllegalArgumentException.class, () -> engine.muovi(null));
+    }
+
+    @Test
+    @DisplayName("combattere e vincere: eroe vivo, XP guadagnata, stanza liberata")
+    void combattiVittoria() {
+        Eroe eroeForte = new Eroe("Aragorn", new Statistiche(30, 8, 3));
+        Nemico goblin = new Nemico("Goblin", new Statistiche(20, 5, 1), 10);
+        Stanza tana = new Stanza("Tana", "Una tana buia", goblin);
+        GameEngine engine = new GameEngine(eroeForte, new Mondo(tana));
+
+        boolean vinto = engine.combatti();
+
+        assertTrue(vinto);
+        assertTrue(eroeForte.isVivo());
+        assertEquals(10, eroeForte.getEsperienza());
+        assertFalse(tana.haNemico());
+    }
+
+    @Test
+    @DisplayName("combattere e perdere: eroe sconfitto, il nemico resta nella stanza")
+    void combattiSconfitta() {
+        Eroe novizio = new Eroe("Novizio", new Statistiche(10, 1, 0));
+        Nemico drago = new Nemico("Drago", new Statistiche(50, 20, 5), 100);
+        Stanza covo = new Stanza("Covo", "Il covo del drago", drago);
+        GameEngine engine = new GameEngine(novizio, new Mondo(covo));
+
+        boolean vinto = engine.combatti();
+
+        assertFalse(vinto);
+        assertFalse(novizio.isVivo());
+        assertTrue(covo.haNemico());
+    }
+
+    @Test
+    @DisplayName("combattere in una stanza senza nemico -> eccezione")
+    void combattiSenzaNemico() {
+        assertThrows(IllegalStateException.class, () -> engine.combatti());
     }
 }

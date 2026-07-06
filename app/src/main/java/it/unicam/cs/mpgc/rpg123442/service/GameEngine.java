@@ -1,6 +1,8 @@
 package it.unicam.cs.mpgc.rpg123442.service;
 
 import it.unicam.cs.mpgc.rpg123442.model.character.Eroe;
+import it.unicam.cs.mpgc.rpg123442.model.character.Nemico;
+import it.unicam.cs.mpgc.rpg123442.model.combat.Combattimento;
 import it.unicam.cs.mpgc.rpg123442.model.world.Direzione;
 import it.unicam.cs.mpgc.rpg123442.model.world.Mondo;
 import it.unicam.cs.mpgc.rpg123442.model.world.Stanza;
@@ -87,5 +89,35 @@ public class GameEngine {
                     return true;
                 })
                 .orElse(false);
+    }
+
+    /**
+     * Fa combattere l'eroe contro il nemico che sorveglia la stanza corrente.
+     * Lo scontro viene giocato per intero, turno dopo turno, finche' uno dei due
+     * non cade. Se l'eroe vince, guadagna l'esperienza rilasciata dal nemico e la
+     * stanza viene liberata.
+     *
+     * <p>Il metodo si limita a <b>coordinare</b> classi gia' esistenti
+     * ({@link Combattimento} per lo scontro, la progressione dell'{@link Eroe}
+     * per l'esperienza): questa e' la sua responsabilita' di regista.
+     *
+     * @return true se l'eroe ha vinto, false se e' stato sconfitto
+     * @throws IllegalStateException se nella stanza corrente non c'e' nessun nemico
+     */
+    public boolean combatti() {
+        Nemico nemico = stanzaCorrente.getNemico().orElseThrow(
+                () -> new IllegalStateException("Non c'e' nessun nemico da combattere in questa stanza"));
+
+        Combattimento scontro = new Combattimento(eroe, nemico); // l'eroe attacca per primo
+        while (!scontro.isFinito()) {
+            scontro.eseguiTurno();
+        }
+
+        boolean eroeVincitore = eroe.isVivo();
+        if (eroeVincitore) {
+            eroe.guadagnaEsperienza(nemico.getEsperienzaRilasciata());
+            stanzaCorrente.rimuoviNemico();
+        }
+        return eroeVincitore;
     }
 }
