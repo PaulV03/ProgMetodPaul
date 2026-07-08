@@ -23,6 +23,9 @@ dependencies {
 
     // This dependency is used by the application.
     implementation(libs.guava)
+
+    // Gson: serializzazione/deserializzazione JSON per la persistenza delle partite.
+    implementation(libs.gson)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
