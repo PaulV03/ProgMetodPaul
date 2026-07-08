@@ -71,4 +71,27 @@ class EroeTest {
         Eroe e = nuovoEroe();
         assertThrows(IllegalArgumentException.class, () -> e.guadagnaEsperienza(-1));
     }
+
+    @Test
+    @DisplayName("il costruttore con progressione ricrea un eroe gia' avviato")
+    void costruttoreConProgressione() {
+        Eroe e = new Eroe("Aragorn", new Statistiche(40, 14, 6), 3, 75);
+
+        assertAll(
+                () -> assertEquals(3, e.getLivello()),
+                () -> assertEquals(75, e.getEsperienza()),
+                () -> assertEquals(40, e.getVitaCorrente()),
+                () -> assertTrue(e.getInventario().isVuoto())
+        );
+    }
+
+    @Test
+    @DisplayName("livello sotto 1 o esperienza negativa nel costruttore -> eccezione")
+    void costruttoreConProgressioneInvalida() {
+        Statistiche s = new Statistiche(30, 10, 4);
+        assertAll(
+                () -> assertThrows(IllegalArgumentException.class, () -> new Eroe("X", s, 0, 0)),
+                () -> assertThrows(IllegalArgumentException.class, () -> new Eroe("X", s, 1, -1))
+        );
+    }
 }

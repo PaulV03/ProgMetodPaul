@@ -32,18 +32,38 @@ public class GameEngine {
     private Stanza stanzaCorrente;
 
     /**
-     * Avvia una partita ponendo l'eroe nella stanza iniziale del mondo.
+     * Avvia una <b>nuova</b> partita ponendo l'eroe nella stanza iniziale del mondo.
      *
      * @param eroe  il personaggio guidato dal giocatore (non null)
      * @param mondo la mappa in cui si svolge l'avventura (non null)
      */
     public GameEngine(Eroe eroe, Mondo mondo) {
-        if (eroe == null || mondo == null) {
-            throw new IllegalArgumentException("Eroe e mondo non possono essere null");
+        this(eroe, mondo, mondo == null ? null : mondo.getStanzaIniziale());
+    }
+
+    /**
+     * Riprende una partita con l'eroe in una stanza qualsiasi del mondo.
+     *
+     * <p>Rispetto al costruttore che parte dalla stanza iniziale, questo permette
+     * di <b>riprendere una partita in corso</b> (per esempio dopo aver caricato un
+     * salvataggio) collocando l'eroe dove si trovava. La stanza indicata deve
+     * appartenere al mondo: cosi' evitiamo stati incoerenti (un eroe "fuori mappa").
+     *
+     * @param eroe           il personaggio guidato dal giocatore (non null)
+     * @param mondo          la mappa in cui si svolge l'avventura (non null)
+     * @param stanzaCorrente la stanza in cui si trova l'eroe (non null, deve essere del mondo)
+     */
+    public GameEngine(Eroe eroe, Mondo mondo, Stanza stanzaCorrente) {
+        if (eroe == null || mondo == null || stanzaCorrente == null) {
+            throw new IllegalArgumentException("Eroe, mondo e stanza corrente non possono essere null");
+        }
+        if (mondo.getStanza(stanzaCorrente.getNome()).orElse(null) != stanzaCorrente) {
+            throw new IllegalArgumentException(
+                    "La stanza corrente non appartiene al mondo: " + stanzaCorrente.getNome());
         }
         this.eroe = eroe;
         this.mondo = mondo;
-        this.stanzaCorrente = mondo.getStanzaIniziale();
+        this.stanzaCorrente = stanzaCorrente;
     }
 
     /**
@@ -51,6 +71,14 @@ public class GameEngine {
      */
     public Eroe getEroe() {
         return eroe;
+    }
+
+    /**
+     * @return la mappa del mondo in cui si svolge la partita.
+     *         Serve, fra l'altro, a chi deve salvare l'intero stato di gioco.
+     */
+    public Mondo getMondo() {
+        return mondo;
     }
 
     /**

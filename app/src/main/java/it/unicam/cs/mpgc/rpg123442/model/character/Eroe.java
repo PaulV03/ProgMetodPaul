@@ -20,10 +20,36 @@ public class Eroe extends AbstractCombattente {
     private int esperienza;
     private final Inventario inventario;
 
+    /**
+     * Crea un nuovo eroe di primo livello, senza esperienza e con l'inventario vuoto.
+     */
     public Eroe(String nome, Statistiche statistiche) {
+        this(nome, statistiche, 1, 0);
+    }
+
+    /**
+     * Crea un eroe a un dato punto di progressione.
+     *
+     * <p>Serve per ricreare un eroe <b>gia' avviato</b> senza dover rigiocare la
+     * sua storia: e' il caso del <i>caricamento di una partita salvata</i>, dove le
+     * statistiche passate sono quelle gia' potenziate dai livelli raggiunti e qui
+     * si ripristinano semplicemente livello ed esperienza correnti.
+     *
+     * @param nome        il nome dell'eroe (non vuoto)
+     * @param statistiche le statistiche attuali (gia' comprensive dei bonus di livello)
+     * @param livello     il livello raggiunto (almeno 1)
+     * @param esperienza  l'esperienza accumulata nel livello corrente (non negativa)
+     */
+    public Eroe(String nome, Statistiche statistiche, int livello, int esperienza) {
         super(nome, statistiche);
-        this.livello = 1;
-        this.esperienza = 0;
+        if (livello < 1) {
+            throw new IllegalArgumentException("Il livello deve essere almeno 1");
+        }
+        if (esperienza < 0) {
+            throw new IllegalArgumentException("L'esperienza non puo' essere negativa");
+        }
+        this.livello = livello;
+        this.esperienza = esperienza;
         this.inventario = new Inventario();
     }
 

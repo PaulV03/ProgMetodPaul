@@ -50,6 +50,22 @@ class GameEngineTest {
     }
 
     @Test
+    @DisplayName("il costruttore con stanza corrente riprende l'eroe in quella stanza")
+    void riprendiInStanzaCorrente() {
+        GameEngine ripreso = new GameEngine(eroe, mondo, salaTrono);
+
+        assertEquals(salaTrono, ripreso.getStanzaCorrente());
+        assertEquals(mondo, ripreso.getMondo());
+    }
+
+    @Test
+    @DisplayName("riprendere in una stanza che non appartiene al mondo -> eccezione")
+    void riprendiInStanzaEstranea() {
+        Stanza estranea = new Stanza("Cripta", "Una cripta di un altro mondo");
+        assertThrows(IllegalArgumentException.class, () -> new GameEngine(eroe, mondo, estranea));
+    }
+
+    @Test
     @DisplayName("muoversi verso un'uscita esistente sposta l'eroe e restituisce true")
     void muoviVersoUscitaEsistente() {
         boolean spostato = engine.muovi(Direzione.NORD);
