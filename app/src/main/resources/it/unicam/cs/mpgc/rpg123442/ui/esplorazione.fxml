@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+    Schermo di esplorazione: descrive COM'E' FATTA la schermata, non cosa fa.
+    Il comportamento vive in EsplorazioneController, agganciato a questo file
+    tramite gli fx:id (campi da riempire) e gli onAction (metodi da chiamare).
+
+    Nota: qui non c'e' l'attributo fx:controller. Il controller viene creato a
+    mano dall'applicazione e passato al caricatore, cosi' puo' ricevere la
+    partita nel costruttore ed essere valido fin dalla nascita.
+-->
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      alignment="CENTER"
+      spacing="12.0"
+      prefWidth="480.0"
+      prefHeight="360.0">
+
+    <padding>
+        <Insets top="30.0" right="30.0" bottom="30.0" left="30.0"/>
+    </padding>
+
+    <Label fx:id="nomeStanza" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <Label fx:id="descrizioneStanza" wrapText="true"/>
+    <Label fx:id="statoNemico"/>
+
+    <Separator/>
+
+    <!-- Le quattro direzioni. Ogni pulsante viene abilitato o disabilitato dal
+         controller a seconda delle uscite della stanza corrente. -->
+    <HBox alignment="CENTER" spacing="8.0">
+        <Button fx:id="bottoneNord" text="Nord" onAction="#vaiNord"/>
+        <Button fx:id="bottoneSud" text="Sud" onAction="#vaiSud"/>
+        <Button fx:id="bottoneEst" text="Est" onAction="#vaiEst"/>
+        <Button fx:id="bottoneOvest" text="Ovest" onAction="#vaiOvest"/>
+    </HBox>
+
+    <Separator/>
+
+    <Label fx:id="statoEroe"/>
+    <Label fx:id="messaggio" wrapText="true" style="-fx-font-style: italic;"/>
+
+</VBox>

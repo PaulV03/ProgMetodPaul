@@ -4,29 +4,40 @@ import it.unicam.cs.mpgc.rpg123442.model.character.Eroe;
 import it.unicam.cs.mpgc.rpg123442.model.character.Statistiche;
 import it.unicam.cs.mpgc.rpg123442.service.GameEngine;
 import it.unicam.cs.mpgc.rpg123442.service.MondoFactory;
+import it.unicam.cs.mpgc.rpg123442.ui.EsplorazioneController;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.URL;
+
 /**
  * Punto di ingresso dell'applicazione: la finestra JavaFX del gioco.
  *
- * <p>Per ora mostra un semplice <b>menu iniziale</b>. Il pulsante "Nuova Partita"
- * assembla una partita ({@link MondoFactory} per il mondo, un eroe di default) e
- * mostra la stanza di partenza: e' la prova che tutta la catena
- * factory &rarr; {@link GameEngine} &rarr; interfaccia grafica funziona.
+ * <p>Mostra un <b>menu iniziale</b>; il pulsante "Nuova Partita" assembla una
+ * partita ({@link MondoFactory} per il mondo, un eroe di default) e apre lo
+ * schermo di esplorazione descritto in <code>esplorazione.fxml</code>.
  *
- * <p>Gli schermi veri di esplorazione e combattimento verranno aggiunti nei passi
- * successivi (con FXML), senza dover riscrivere questa impalcatura.
+ * <p>La sua responsabilita' e' quella di <b>montatore</b>: costruisce gli oggetti
+ * del dominio e li consegna alla schermata giusta. Non conosce le regole del
+ * gioco (stanno nel motore) ne' come e' disegnata una schermata (sta nell'FXML).
  */
 public class App extends Application {
 
     private static final String TITOLO = "RPG a turni";
+
+    /** Percorso dello schermo di esplorazione, dentro le risorse del progetto. */
+    private static final String FXML_ESPLORAZIONE =
+            "/it/unicam/cs/mpgc/rpg123442/ui/esplorazione.fxml";
 
     @Override
     public void start(Stage stage) {
@@ -56,24 +67,37 @@ public class App extends Application {
     }
 
     /**
-     * Avvia una nuova partita e mostra, per ora, solo la stanza iniziale.
-     * E' un segnaposto: al prossimo passo diventera' lo schermo di esplorazione
-     * con i pulsanti di movimento collegati a {@link GameEngine#muovi}.
+     * Avvia una nuova partita e ne apre lo schermo di esplorazione.
      */
     private Scene schermoPartita() {
         Eroe eroe = new Eroe("Eroe", new Statistiche(30, 10, 4));
         GameEngine partita = new GameEngine(eroe, MondoFactory.creaMondoDiDefault());
+        return new Scene(caricaEsplorazione(partita));
+    }
 
-        Label dove = new Label("Sei in: " + partita.getStanzaCorrente().getNome());
-        dove.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
-        Label descrizione = new Label(partita.getStanzaCorrente().getDescrizione());
-        descrizione.setWrapText(true);
-
-        VBox radice = new VBox(15, dove, descrizione);
-        radice.setAlignment(Pos.CENTER);
-        radice.setPadding(new Insets(40));
-        return new Scene(radice, 480, 360);
+    /**
+     * Carica lo schermo di esplorazione collegandolo alla partita indicata.
+     *
+     * <p>Il controller viene creato qui e passato al caricatore gia' pronto:
+     * per questo l'FXML non dichiara <code>fx:controller</code>. In cambio il
+     * controller riceve la partita nel costruttore e non puo' trovarsi senza.
+     *
+     * @throws UncheckedIOException se il file FXML manca o e' malformato: sarebbe
+     *         un errore di programmazione, non una situazione che l'utente possa
+     *         correggere, quindi non ha senso obbligare chi chiama a gestirlo
+     */
+    private Parent caricaEsplorazione(GameEngine partita) {
+        URL risorsa = App.class.getResource(FXML_ESPLORAZIONE);
+        if (risorsa == null) {
+            throw new IllegalStateException("Schermata non trovata: " + FXML_ESPLORAZIONE);
+        }
+        FXMLLoader caricatore = new FXMLLoader(risorsa);
+        caricatore.setController(new EsplorazioneController(partita));
+        try {
+            return caricatore.load();
+        } catch (IOException e) {
+            throw new UncheckedIOException("Impossibile caricare " + FXML_ESPLORAZIONE, e);
+        }
     }
 
     public static void main(String[] args) {
