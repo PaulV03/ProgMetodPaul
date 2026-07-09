@@ -8,6 +8,9 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    // Plugin JavaFX: da Java 11 JavaFX non e' piu' nel JDK. Questo plugin scarica i
+    // moduli JavaFX e li mette nel classpath, cosi' bastano ./gradlew build e run.
+    alias(libs.plugins.javafx)
 }
 
 repositories {
@@ -33,6 +36,12 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
     }
+}
+
+// Moduli JavaFX richiesti: controls (bottoni, label, layout) e fxml (schermate .fxml).
+javafx {
+    version = "25"
+    modules = listOf("javafx.controls", "javafx.fxml")
 }
 
 application {
