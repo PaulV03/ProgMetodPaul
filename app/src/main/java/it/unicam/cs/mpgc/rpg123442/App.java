@@ -2,8 +2,10 @@ package it.unicam.cs.mpgc.rpg123442;
 
 import it.unicam.cs.mpgc.rpg123442.service.GameEngine;
 import it.unicam.cs.mpgc.rpg123442.service.PartitaFactory;
+import it.unicam.cs.mpgc.rpg123442.service.StatoPartita;
 import it.unicam.cs.mpgc.rpg123442.ui.CombattimentoController;
 import it.unicam.cs.mpgc.rpg123442.ui.EsplorazioneController;
+import it.unicam.cs.mpgc.rpg123442.ui.FineController;
 import it.unicam.cs.mpgc.rpg123442.ui.Navigazione;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -45,6 +47,8 @@ public class App extends Application implements Navigazione {
             "/it/unicam/cs/mpgc/rpg123442/ui/esplorazione.fxml";
     private static final String FXML_COMBATTIMENTO =
             "/it/unicam/cs/mpgc/rpg123442/ui/combattimento.fxml";
+    private static final String FXML_FINE =
+            "/it/unicam/cs/mpgc/rpg123442/ui/fine.fxml";
 
     /** L'aspetto di tutte le schermate: colori, caratteri, spaziature. */
     private static final String CSS = "/it/unicam/cs/mpgc/rpg123442/ui/stile.css";
@@ -114,8 +118,23 @@ public class App extends Application implements Navigazione {
         mostraEsplorazione();
     }
 
+    /**
+     * Riporta il giocatore nel mondo — <b>se</b> c'e' ancora una partita da giocare.
+     *
+     * <p>Qui sta l'unico controllo di fine partita del gioco. Chiunque voglia
+     * tornare a esplorare passa di qua (il menu quando comincia, lo scontro quando
+     * finisce), quindi e' il punto in cui la domanda "e' finita?" va fatta una volta
+     * sola: nessun controller deve ricordarsi di porsela, e nessuno puo'
+     * dimenticarsene. I controller chiedono di andare nel mondo; se il mondo non ha
+     * piu' niente da offrire — l'eroe e' caduto, oppure il dungeon e' ripulito — e'
+     * l'applicazione a dirottarli sulla schermata di fine.
+     */
     @Override
     public void mostraEsplorazione() {
+        if (partita.statoPartita() != StatoPartita.IN_CORSO) {
+            mostra(FXML_FINE, new FineController(partita, this));
+            return;
+        }
         mostra(FXML_ESPLORAZIONE, new EsplorazioneController(partita, this));
     }
 
@@ -123,6 +142,16 @@ public class App extends Application implements Navigazione {
     public void mostraCombattimento() {
         mostra(FXML_COMBATTIMENTO,
                 new CombattimentoController(partita.iniziaCombattimento(), this));
+    }
+
+    /**
+     * Torna al menu iniziale e lascia andare la partita: quella finita e' storia,
+     * la prossima nascera' nuova da {@link PartitaFactory}.
+     */
+    @Override
+    public void mostraMenuIniziale() {
+        this.partita = null;
+        stage.setScene(menuIniziale());
     }
 
     /**

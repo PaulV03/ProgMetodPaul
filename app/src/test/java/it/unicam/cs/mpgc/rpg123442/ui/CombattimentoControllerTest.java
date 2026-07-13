@@ -62,6 +62,11 @@ class CombattimentoControllerTest {
         public void mostraCombattimento() {
             // non serve a questi test
         }
+
+        @Override
+        public void mostraMenuIniziale() {
+            // non serve a questi test
+        }
     }
 
     private static <T> T sulThreadGrafico(Callable<T> compito) throws Exception {

@@ -25,4 +25,12 @@ public interface Navigazione {
      * Apre lo scontro con il nemico della stanza corrente.
      */
     void mostraCombattimento();
+
+    /**
+     * Riporta al menu iniziale, abbandonando la partita in corso.
+     *
+     * <p>E' l'unica strada offerta a partita finita, ma non e' un metodo "della
+     * fine": e' semplicemente un'altra schermata raggiungibile, come le altre.
+     */
+    void mostraMenuIniziale();
 }

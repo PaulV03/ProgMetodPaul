@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+    Schermo di fine partita: l'esito, un rigo sull'eroe, e la via d'uscita.
+
+    Come le altre schermate non dichiara fx:controller: il controller viene creato
+    dall'applicazione e passato gia' pronto al caricatore, cosi' riceve la partita
+    nel costruttore.
+
+    L'etichetta "esito" nasce senza colore: e' il controller ad aggiungerle la
+    classe della vittoria o della sconfitta, perche' solo lui sa com'e' finita.
+-->
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      styleClass="schermo"
+      alignment="CENTER"
+      spacing="16.0"
+      prefWidth="560.0"
+      prefHeight="420.0">
+
+    <padding>
+        <Insets top="40.0" right="40.0" bottom="40.0" left="40.0"/>
+    </padding>
+
+    <Label fx:id="titoloFine" styleClass="titolo-gioco"/>
+    <Label fx:id="esito" styleClass="esito" wrapText="true"/>
+
+    <Separator/>
+
+    <Label fx:id="riepilogo" styleClass="scheda-eroe"/>
+
+    <Button fx:id="bottoneMenu" text="Torna al menu" onAction="#tornaAlMenu" prefWidth="200.0"/>
+
+</VBox>

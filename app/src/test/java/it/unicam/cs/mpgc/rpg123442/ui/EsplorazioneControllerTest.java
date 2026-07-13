@@ -76,6 +76,11 @@ class EsplorazioneControllerTest {
         public void mostraCombattimento() {
             combattimentoChiesto = true;
         }
+
+        @Override
+        public void mostraMenuIniziale() {
+            // niente da fare: qui non si disegna nulla
+        }
     }
 
     /** Carica lo schermo di esplorazione per una nuova partita nel mondo di default. */
