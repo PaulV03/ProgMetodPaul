@@ -83,18 +83,45 @@ class EsplorazioneControllerTest {
         }
     }
 
+    /**
+     * Una gestione dei salvataggi finta: non apre nessun dialogo e non scrive niente,
+     * annota soltanto che cosa le e' stato chiesto. E' la ragione per cui il
+     * controller dipende dall'interfaccia {@link GestioneSalvataggi} e non
+     * dall'applicazione: altrimenti premere "Salva" in un test aprirebbe una finestra
+     * di dialogo, e il test non finirebbe mai.
+     */
+    private static final class SalvataggiFinti implements GestioneSalvataggi {
+        private boolean salvataggioChiesto;
+        private boolean caricamentoChiesto;
+
+        @Override
+        public void salvaPartita() {
+            salvataggioChiesto = true;
+        }
+
+        @Override
+        public void caricaPartita() {
+            caricamentoChiesto = true;
+        }
+    }
+
     /** Carica lo schermo di esplorazione per una nuova partita nel mondo di default. */
-    private static Parent caricaSchermo(Navigazione navigazione) throws Exception {
+    private static Parent caricaSchermo(Navigazione navigazione, GestioneSalvataggi salvataggi)
+            throws Exception {
         GameEngine partita = new GameEngine(
                 new Eroe("Eroe", new Statistiche(30, 10, 4)),
                 MondoFactory.creaMondoDiDefault());
         FXMLLoader caricatore = new FXMLLoader(EsplorazioneControllerTest.class.getResource(FXML));
-        caricatore.setController(new EsplorazioneController(partita, navigazione));
+        caricatore.setController(new EsplorazioneController(partita, navigazione, salvataggi));
         return caricatore.load();
     }
 
+    private static Parent caricaSchermo(Navigazione navigazione) throws Exception {
+        return caricaSchermo(navigazione, new SalvataggiFinti());
+    }
+
     private static Parent caricaSchermo() throws Exception {
-        return caricaSchermo(new NavigazioneFinta());
+        return caricaSchermo(new NavigazioneFinta(), new SalvataggiFinti());
     }
 
     private static String testoDi(Parent radice, String fxId) {
@@ -177,5 +204,35 @@ class EsplorazioneControllerTest {
         });
 
         assertTrue(navigazione.combattimentoChiesto);
+    }
+
+    @Test
+    @DisplayName("premere Salva chiede di salvare la partita")
+    void premereSalvaChiedeDiSalvare() throws Exception {
+        SalvataggiFinti salvataggi = new SalvataggiFinti();
+        Parent radice = sulThreadGrafico(
+                () -> caricaSchermo(new NavigazioneFinta(), salvataggi));
+
+        sulThreadGrafico(() -> {
+            bottone(radice, "bottoneSalva").fire();
+            return null;
+        });
+
+        assertTrue(salvataggi.salvataggioChiesto);
+    }
+
+    @Test
+    @DisplayName("premere Carica chiede di riprendere una partita salvata")
+    void premereCaricaChiedeDiCaricare() throws Exception {
+        SalvataggiFinti salvataggi = new SalvataggiFinti();
+        Parent radice = sulThreadGrafico(
+                () -> caricaSchermo(new NavigazioneFinta(), salvataggi));
+
+        sulThreadGrafico(() -> {
+            bottone(radice, "bottoneCarica").fire();
+            return null;
+        });
+
+        assertTrue(salvataggi.caricamentoChiesto);
     }
 }
