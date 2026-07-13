@@ -1,8 +1,6 @@
 package it.unicam.cs.mpgc.rpg123442.service;
 
 import it.unicam.cs.mpgc.rpg123442.model.character.Eroe;
-import it.unicam.cs.mpgc.rpg123442.model.character.Nemico;
-import it.unicam.cs.mpgc.rpg123442.model.combat.Combattimento;
 import it.unicam.cs.mpgc.rpg123442.model.world.Direzione;
 import it.unicam.cs.mpgc.rpg123442.model.world.Mondo;
 import it.unicam.cs.mpgc.rpg123442.model.world.Stanza;
@@ -120,33 +118,39 @@ public class GameEngine {
     }
 
     /**
-     * Fa combattere l'eroe contro il nemico che sorveglia la stanza corrente.
-     * Lo scontro viene giocato per intero, turno dopo turno, finche' uno dei due
-     * non cade. Se l'eroe vince, guadagna l'esperienza rilasciata dal nemico e la
-     * stanza viene liberata.
+     * Apre uno scontro con il nemico che sorveglia la stanza corrente, da giocare
+     * <b>un'azione alla volta</b>.
      *
-     * <p>Il metodo si limita a <b>coordinare</b> classi gia' esistenti
-     * ({@link Combattimento} per lo scontro, la progressione dell'{@link Eroe}
-     * per l'esperienza): questa e' la sua responsabilita' di regista.
+     * <p>E' la via che usa l'interfaccia grafica: restituisce lo scontro in corso e
+     * lascia che sia il giocatore a decidere, turno dopo turno, se attaccare o
+     * usare un oggetto.
+     *
+     * @return lo scontro appena iniziato
+     * @throws IllegalStateException se nella stanza corrente non c'e' nessun nemico
+     */
+    public SessioneCombattimento iniziaCombattimento() {
+        return new SessioneCombattimento(eroe, stanzaCorrente);
+    }
+
+    /**
+     * Fa combattere l'eroe contro il nemico della stanza corrente risolvendo lo
+     * scontro <b>per intero</b>, come se l'eroe attaccasse a oltranza senza usare
+     * oggetti. Se vince, guadagna l'esperienza del nemico e la stanza resta libera.
+     *
+     * <p>E' la scorciatoia per chi non vuole giocare i turni a mano (uno script,
+     * un test, una futura modalita' automatica). Non ripete le regole dello scontro:
+     * le chiede alla stessa {@link SessioneCombattimento} usata dall'interfaccia
+     * grafica, cosi' le due strade non possono divergere.
      *
      * @return true se l'eroe ha vinto, false se e' stato sconfitto
      * @throws IllegalStateException se nella stanza corrente non c'e' nessun nemico
      */
     public boolean combatti() {
-        Nemico nemico = stanzaCorrente.getNemico().orElseThrow(
-                () -> new IllegalStateException("Non c'e' nessun nemico da combattere in questa stanza"));
-
-        Combattimento scontro = new Combattimento(eroe, nemico); // l'eroe attacca per primo
+        SessioneCombattimento scontro = iniziaCombattimento();
         while (!scontro.isFinito()) {
-            scontro.eseguiTurno();
+            scontro.attacca();
         }
-
-        boolean eroeVincitore = eroe.isVivo();
-        if (eroeVincitore) {
-            eroe.guadagnaEsperienza(nemico.getEsperienzaRilasciata());
-            stanzaCorrente.rimuoviNemico();
-        }
-        return eroeVincitore;
+        return scontro.eroeVincitore();
     }
 
     /**
