@@ -3,14 +3,16 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <!--
-    Schermo di esplorazione: descrive COM'E' FATTA la schermata, non cosa fa.
-    Il comportamento vive in EsplorazioneController, agganciato a questo file
-    tramite gli fx:id (campi da riempire) e gli onAction (metodi da chiamare).
+    Schermo di esplorazione: descrive COM'E' FATTA la schermata, non cosa fa e
+    nemmeno che colore ha. Il comportamento vive in EsplorazioneController
+    (agganciato tramite gli fx:id e gli onAction); i colori in stile.css
+    (agganciato tramite le styleClass).
 
     Nota: qui non c'e' l'attributo fx:controller. Il controller viene creato a
     mano dall'applicazione e passato al caricatore, cosi' puo' ricevere la
@@ -18,21 +20,22 @@
 -->
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
+      styleClass="schermo"
       alignment="CENTER"
       spacing="12.0"
-      prefWidth="480.0"
-      prefHeight="360.0">
+      prefWidth="560.0"
+      prefHeight="420.0">
 
     <padding>
-        <Insets top="30.0" right="30.0" bottom="30.0" left="30.0"/>
+        <Insets top="30.0" right="40.0" bottom="30.0" left="40.0"/>
     </padding>
 
-    <Label fx:id="nomeStanza" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-    <Label fx:id="descrizioneStanza" wrapText="true"/>
-    <Label fx:id="statoNemico"/>
+    <Label fx:id="nomeStanza" styleClass="titolo-schermo"/>
+    <Label fx:id="descrizioneStanza" styleClass="descrizione" wrapText="true"/>
+    <Label fx:id="statoNemico" styleClass="scheda-nemico"/>
 
     <!-- Attivo solo quando la stanza e' sorvegliata: non si attacca il vuoto. -->
-    <Button fx:id="bottoneCombatti" text="Combatti!" onAction="#combatti"/>
+    <Button fx:id="bottoneCombatti" text="Combatti!" styleClass="button-attacco" onAction="#combatti"/>
 
     <Separator/>
 
@@ -47,7 +50,8 @@
 
     <Separator/>
 
-    <Label fx:id="statoEroe"/>
-    <Label fx:id="messaggio" wrapText="true" style="-fx-font-style: italic;"/>
+    <Label fx:id="statoEroe" styleClass="scheda-eroe"/>
+    <ProgressBar fx:id="barraEroe" styleClass="barra-vita" prefWidth="240.0" progress="1.0"/>
+    <Label fx:id="messaggio" styleClass="messaggio" wrapText="true"/>
 
 </VBox>

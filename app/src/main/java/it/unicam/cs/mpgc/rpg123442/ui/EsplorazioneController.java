@@ -8,6 +8,7 @@ import it.unicam.cs.mpgc.rpg123442.service.GameEngine;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -35,6 +36,8 @@ public class EsplorazioneController {
     @FXML private Label statoNemico;
     @FXML private Label statoEroe;
     @FXML private Label messaggio;
+
+    @FXML private ProgressBar barraEroe;
 
     @FXML private Button bottoneNord;
     @FXML private Button bottoneSud;
@@ -118,6 +121,7 @@ public class EsplorazioneController {
         descrizioneStanza.setText(stanza.getDescrizione());
         statoNemico.setText(descriviNemico(stanza));
         statoEroe.setText(descriviEroe(partita.getEroe()));
+        BarraVita.aggiorna(barraEroe, partita.getEroe());
 
         // Un pulsante e' attivo solo se dalla stanza corrente si esce da quella parte.
         bottoniPerDirezione.forEach(

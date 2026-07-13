@@ -8,6 +8,7 @@ import it.unicam.cs.mpgc.rpg123442.service.SessioneCombattimento;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 
 import java.util.List;
@@ -34,6 +35,9 @@ public class CombattimentoController {
     @FXML private Label statoEroe;
     @FXML private Label esito;
     @FXML private TextArea diario;
+
+    @FXML private ProgressBar barraNemico;
+    @FXML private ProgressBar barraEroe;
 
     @FXML private Button bottoneAttacca;
     @FXML private Button bottonePozione;
@@ -120,6 +124,9 @@ public class CombattimentoController {
         statoNemico.setText(descrivi(scontro.getNemico()));
         statoEroe.setText(descriviEroe(scontro.getEroe()));
         esito.setText(descriviEsito());
+
+        BarraVita.aggiorna(barraNemico, scontro.getNemico());
+        BarraVita.aggiorna(barraEroe, scontro.getEroe());
 
         boolean finito = scontro.isFinito();
         bottoneAttacca.setDisable(finito);

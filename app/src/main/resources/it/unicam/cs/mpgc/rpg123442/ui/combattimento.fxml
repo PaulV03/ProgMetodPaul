@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.HBox?>
@@ -11,40 +12,48 @@
 <!--
     Schermo di combattimento: come per l'esplorazione, qui c'e' solo l'ASPETTO.
     Le azioni vivono in CombattimentoController, collegato tramite gli fx:id
-    (i campi da riempire) e gli onAction (i metodi da chiamare al click).
+    (i campi da riempire) e gli onAction (i metodi da chiamare al click);
+    i colori vivono in stile.css, agganciati tramite le styleClass.
 
     Anche qui niente fx:controller: il controller viene costruito dall'applicazione
     con lo scontro gia' in corso, e passato al caricatore.
 -->
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
+      styleClass="schermo"
       alignment="CENTER"
-      spacing="12.0"
-      prefWidth="480.0"
-      prefHeight="360.0">
+      spacing="10.0"
+      prefWidth="560.0"
+      prefHeight="460.0">
 
     <padding>
-        <Insets top="30.0" right="30.0" bottom="30.0" left="30.0"/>
+        <Insets top="30.0" right="40.0" bottom="30.0" left="40.0"/>
     </padding>
 
-    <Label fx:id="titolo" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-    <Label fx:id="statoNemico"/>
-    <Label fx:id="statoEroe"/>
+    <Label fx:id="titolo" styleClass="titolo-schermo"/>
+
+    <Label fx:id="statoNemico" styleClass="scheda-nemico"/>
+    <ProgressBar fx:id="barraNemico" styleClass="barra-vita" prefWidth="240.0" progress="1.0"/>
+
+    <Label fx:id="statoEroe" styleClass="scheda-eroe"/>
+    <ProgressBar fx:id="barraEroe" styleClass="barra-vita" prefWidth="240.0" progress="1.0"/>
 
     <Separator/>
 
     <!-- Il resoconto dei colpi, turno dopo turno. Di sola lettura: e' un racconto,
          non un campo da compilare. -->
-    <TextArea fx:id="diario" editable="false" focusTraversable="false"
+    <TextArea fx:id="diario" styleClass="diario" editable="false" focusTraversable="false"
               prefRowCount="6" wrapText="true"/>
 
-    <Label fx:id="esito" wrapText="true" style="-fx-font-weight: bold;"/>
+    <Label fx:id="esito" styleClass="esito" wrapText="true"/>
 
     <!-- Le azioni del giocatore. Il controller abilita solo quelle possibili:
          niente attacchi a scontro finito, niente pozioni se non ne restano. -->
     <HBox alignment="CENTER" spacing="8.0">
-        <Button fx:id="bottoneAttacca" text="Attacca" onAction="#attacca" defaultButton="true"/>
-        <Button fx:id="bottonePozione" text="Usa pozione" onAction="#usaPozione"/>
+        <Button fx:id="bottoneAttacca" text="Attacca" styleClass="button-attacco"
+                onAction="#attacca" defaultButton="true"/>
+        <Button fx:id="bottonePozione" text="Usa pozione" styleClass="button-cura"
+                onAction="#usaPozione"/>
         <Button fx:id="bottoneContinua" text="Continua" onAction="#continua"/>
     </HBox>
 

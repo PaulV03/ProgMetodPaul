@@ -1,0 +1,188 @@
+/*
+ * Aspetto del gioco: colori, spaziature, caratteri.
+ *
+ * Sta qui e non nel codice Java per la stessa ragione per cui la struttura delle
+ * schermate sta nei file FXML: sono tre cose diverse e vanno cambiate
+ * indipendentemente. Un ritocco alla palette non deve far ricompilare nulla, e
+ * un controller non deve sapere di che colore e' un pulsante.
+ *
+ * Palette "dungeon": pietra scura, testo osso, oro per i titoli, rosso sangue per
+ * il nemico, verde per la cura.
+ */
+
+/* Colori usati in tutto il foglio: definiti una volta sola, cosi' cambiare tema
+   significa toccare solo queste righe (e non ottanta). */
+.root {
+    -colore-fondo: #1b1714;
+    -colore-fondo-chiaro: #2a2420;
+    -colore-testo: #e8dfd0;
+    -colore-testo-tenue: #a2968a;
+    -colore-oro: #d4a24a;
+    -colore-sangue: #8c2f24;
+    -colore-cura: #4a7f43;
+    -colore-bordo: #4a3f36;
+
+    -fx-font-family: "Georgia", "Cambria", serif;
+    -fx-background-color: -colore-fondo;
+}
+
+/* Ogni schermata: sfondo scuro con una lieve sfumatura, come una stanza
+   illuminata da una torcia al centro. */
+.schermo {
+    -fx-background-color: radial-gradient(center 50% 30%, radius 70%,
+                          -colore-fondo-chiaro 0%, -colore-fondo 100%);
+}
+
+.label {
+    -fx-text-fill: -colore-testo;
+}
+
+/* Il nome del gioco nel menu. */
+.titolo-gioco {
+    -fx-font-size: 42px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -colore-oro;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 12, 0.3, 0, 3);
+}
+
+.sottotitolo {
+    -fx-font-size: 14px;
+    -fx-text-fill: -colore-testo-tenue;
+    -fx-font-style: italic;
+}
+
+/* Il titolo di una schermata: il nome della stanza, "Scontro!". */
+.titolo-schermo {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -colore-oro;
+}
+
+.descrizione {
+    -fx-font-size: 14px;
+    -fx-text-fill: -colore-testo-tenue;
+}
+
+/* La scheda di un combattente (nome, punti vita): l'eroe in chiaro, il nemico in rosso. */
+.scheda-eroe {
+    -fx-font-size: 14px;
+    -fx-text-fill: -colore-testo;
+}
+
+.scheda-nemico {
+    -fx-font-size: 14px;
+    -fx-text-fill: -colore-sangue;
+    -fx-font-weight: bold;
+}
+
+.messaggio {
+    -fx-font-style: italic;
+    -fx-text-fill: -colore-testo-tenue;
+}
+
+.esito {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -colore-oro;
+}
+
+/* --- Pulsanti ------------------------------------------------------------- */
+
+.button {
+    -fx-background-color: -colore-fondo-chiaro;
+    -fx-text-fill: -colore-testo;
+    -fx-border-color: -colore-bordo;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 8px 18px;
+    -fx-cursor: hand;
+}
+
+/* Il pulsante sotto il puntatore si accende d'oro: si capisce dove si sta per premere. */
+.button:hover {
+    -fx-border-color: -colore-oro;
+    -fx-text-fill: -colore-oro;
+}
+
+/* Un pulsante spento e' un'azione impossibile adesso (un muro, una pozione finita):
+   deve sembrare inerte, non invitante. */
+.button:disabled {
+    -fx-opacity: 0.35;
+    -fx-cursor: default;
+}
+
+/* L'azione pericolosa: attaccare. */
+.button-attacco {
+    -fx-border-color: -colore-sangue;
+}
+
+.button-attacco:hover {
+    -fx-background-color: -colore-sangue;
+    -fx-text-fill: -colore-testo;
+    -fx-border-color: -colore-sangue;
+}
+
+/* L'azione che rimette in sesto: bere una pozione. */
+.button-cura {
+    -fx-border-color: -colore-cura;
+}
+
+.button-cura:hover {
+    -fx-background-color: -colore-cura;
+    -fx-text-fill: -colore-testo;
+    -fx-border-color: -colore-cura;
+}
+
+/* --- Barre della vita ------------------------------------------------------ */
+
+.progress-bar {
+    -fx-pref-height: 14px;
+    -fx-background-color: -colore-fondo-chiaro;
+    -fx-border-color: -colore-bordo;
+    -fx-border-radius: 3px;
+}
+
+.progress-bar > .track {
+    -fx-background-color: #14100e;
+    -fx-background-radius: 2px;
+}
+
+/* Il colore della barra racconta la situazione a colpo d'occhio, senza leggere i
+   numeri: piena = verde, sotto meta' = oro, agli sgoccioli = sangue.
+   E' il controller a scegliere quale di queste classi applicare. */
+.barra-vita > .bar {
+    -fx-background-color: -colore-cura;
+    -fx-background-insets: 1px;
+    -fx-background-radius: 2px;
+}
+
+.barra-vita-media > .bar {
+    -fx-background-color: -colore-oro;
+}
+
+.barra-vita-bassa > .bar {
+    -fx-background-color: -colore-sangue;
+}
+
+/* --- Diario del combattimento ---------------------------------------------- */
+
+/* Il racconto dei colpi: una pergamena scura, di sola lettura. */
+.diario {
+    -fx-font-family: "Consolas", monospace;
+    -fx-font-size: 12px;
+    -fx-control-inner-background: #14100e;
+    -fx-text-fill: -colore-testo;
+    -fx-highlight-fill: -colore-bordo;
+    -fx-border-color: -colore-bordo;
+    -fx-border-radius: 3px;
+}
+
+.diario .content {
+    -fx-background-color: #14100e;
+}
+
+.separator *.line {
+    -fx-border-color: -colore-bordo;
+    -fx-border-width: 1px 0 0 0;
+}
