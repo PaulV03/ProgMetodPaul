@@ -65,13 +65,50 @@ public class Combattimento {
             throw new IllegalStateException("Il combattimento e' gia' finito");
         }
         Combattente attaccante = turnoDi;
-        Combattente difensore = (turnoDi == sfidante1) ? sfidante2 : sfidante1;
+        Combattente difensore = avversarioDi(attaccante);
 
         int danno = calcolatoreDanno.calcola(attaccante, difensore);
         difensore.subisciDanno(danno);
 
         turnoDi = difensore; // il turno passa all'avversario
         return new RisultatoTurno(attaccante, difensore, danno);
+    }
+
+    /**
+     * Consuma il turno dell'attaccante di turno <b>senza</b> attaccare, cedendolo
+     * all'avversario.
+     *
+     * <p>Serve a chi, invece di colpire, ha speso il proprio turno in un'altra
+     * azione (bere una pozione, per esempio). Il combattimento non ha bisogno di
+     * sapere <i>quale</i> azione sia stata compiuta: gli basta sapere che il turno
+     * e' finito. Cosi' resta aperto ad azioni nuove senza dover essere modificato
+     * (Open/Closed), e continua a occuparsi solo di una cosa: l'alternanza dei
+     * turni e i colpi.
+     *
+     * @throws IllegalStateException se il combattimento e' gia' finito
+     */
+    public void passaTurno() {
+        if (isFinito()) {
+            throw new IllegalStateException("Il combattimento e' gia' finito");
+        }
+        turnoDi = avversarioDi(turnoDi);
+    }
+
+    /**
+     * @return il combattente che si trova dall'altra parte rispetto a quello indicato
+     */
+    private Combattente avversarioDi(Combattente combattente) {
+        return (combattente == sfidante1) ? sfidante2 : sfidante1;
+    }
+
+    /**
+     * @return il combattente a cui tocca agire adesso.
+     *         Permette a chi orchestra lo scontro (il motore di gioco) di sapere
+     *         se e' il momento di chiedere una mossa al giocatore o di far agire
+     *         l'avversario.
+     */
+    public Combattente getTurnoDi() {
+        return turnoDi;
     }
 
     /**

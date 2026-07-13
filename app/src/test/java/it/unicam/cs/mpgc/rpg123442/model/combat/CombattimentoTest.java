@@ -85,6 +85,46 @@ class CombattimentoTest {
     }
 
     @Test
+    @DisplayName("passare il turno lo cede all'avversario senza fare danno")
+    void passaTurnoCedeIlTurnoSenzaDanno() {
+        Eroe e = eroe();
+        Nemico g = goblin();
+        Combattimento c = new Combattimento(e, g);
+
+        c.passaTurno(); // l'eroe rinuncia al colpo (ha fatto altro)
+
+        assertAll(
+                () -> assertEquals(g, c.getTurnoDi(), "ora tocca al goblin"),
+                () -> assertEquals(20, g.getVitaCorrente(), "il goblin non deve aver subito danno"),
+                () -> assertEquals(30, e.getVitaCorrente(), "nemmeno l'eroe deve subire danno")
+        );
+    }
+
+    @Test
+    @DisplayName("dopo un turno passato tocca all'avversario attaccare")
+    void dopoPassaTurnoAttaccaLAvversario() {
+        Eroe e = eroe();
+        Nemico g = goblin();
+        Combattimento c = new Combattimento(e, g);
+
+        c.passaTurno();
+        RisultatoTurno r = c.eseguiTurno();
+
+        assertEquals(g, r.attaccante());
+        assertEquals(e, r.difensore());
+    }
+
+    @Test
+    @DisplayName("passare il turno dopo la fine -> eccezione")
+    void passaTurnoDopoLaFineLanciaEccezione() {
+        Combattimento c = new Combattimento(eroe(), goblin());
+        while (!c.isFinito()) {
+            c.eseguiTurno();
+        }
+        assertThrows(IllegalStateException.class, c::passaTurno);
+    }
+
+    @Test
     @DisplayName("non si puo' combattere contro se stessi")
     void nonSiCombatteControSeStessi() {
         Eroe e = eroe();
