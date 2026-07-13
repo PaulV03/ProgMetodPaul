@@ -6,48 +6,49 @@
  * indipendentemente. Un ritocco alla palette non deve far ricompilare nulla, e
  * un controller non deve sapere di che colore e' un pulsante.
  *
- * Palette "dungeon": pietra scura, testo osso, oro per i titoli, rosso sangue per
- * il nemico, verde per la cura.
+ * Palette "castello di notte": pietra d'antracite e ombre nere, il blu della notte
+ * lunare, le fiamme delle torce e il giallo caldo delle lanterne. Nel resto del
+ * foglio i colori si usano sempre per il loro RUOLO (la torcia = il pericolo,
+ * l'edera = la cura): per ricolorare il gioco basta percio' cambiare il blocco
+ * qui sotto.
  */
-
-/* Colori usati in tutto il foglio: definiti una volta sola, cosi' cambiare tema
-   significa toccare solo queste righe (e non ottanta). */
 .root {
-    -colore-fondo: #1b1714;
-    -colore-fondo-chiaro: #2a2420;
-    -colore-testo: #e8dfd0;
-    -colore-testo-tenue: #a2968a;
-    -colore-oro: #d4a24a;
-    -colore-sangue: #8c2f24;
-    -colore-cura: #4a7f43;
-    -colore-bordo: #4a3f36;
+    -pietra: #2f3438;          /* grigio antracite: mura, pavimento, scale */
+    -ombra: #101317;           /* nero: ombre profonde, cancelli, cielo notturno */
+    -notte: #1b2a44;           /* blu notte: il cielo illuminato dalla luna */
+    -pietra-lunare: #6d7d8c;   /* blu-grigio: riflessi lunari sulla pietra */
+    -torcia: #e0701d;          /* arancione intenso: la fiamma delle torce */
+    -lanterna: #edc55a;        /* giallo dorato: lanterne e finestre illuminate */
+    -legno: #3a2a1d;           /* marrone scuro: botti e travi */
+    -edera: #3f7a4c;           /* verde scuro: l'edera sulle mura */
+    -luna: #eef3f8;            /* bianco freddo: la luna e i riflessi piu' vivi */
 
     -fx-font-family: "Georgia", "Cambria", serif;
-    -fx-background-color: -colore-fondo;
+    -fx-background-color: -ombra;
 }
 
-/* Ogni schermata: sfondo scuro con una lieve sfumatura, come una stanza
-   illuminata da una torcia al centro. */
+/* Ogni schermata: la pietra del castello sotto un cielo blu notte, con il buio
+   che si addensa verso i bordi. */
 .schermo {
-    -fx-background-color: radial-gradient(center 50% 30%, radius 70%,
-                          -colore-fondo-chiaro 0%, -colore-fondo 100%);
+    -fx-background-color: radial-gradient(center 50% 25%, radius 75%,
+                          -notte 0%, -pietra 45%, -ombra 100%);
 }
 
 .label {
-    -fx-text-fill: -colore-testo;
+    -fx-text-fill: -luna;
 }
 
-/* Il nome del gioco nel menu. */
+/* Il nome del gioco nel menu: la luce calda di una lanterna nel buio. */
 .titolo-gioco {
     -fx-font-size: 42px;
     -fx-font-weight: bold;
-    -fx-text-fill: -colore-oro;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 12, 0.3, 0, 3);
+    -fx-text-fill: -lanterna;
+    -fx-effect: dropshadow(gaussian, rgba(237, 197, 90, 0.35), 18, 0.2, 0, 0);
 }
 
 .sottotitolo {
     -fx-font-size: 14px;
-    -fx-text-fill: -colore-testo-tenue;
+    -fx-text-fill: -pietra-lunare;
     -fx-font-style: italic;
 }
 
@@ -55,43 +56,45 @@
 .titolo-schermo {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-text-fill: -colore-oro;
+    -fx-text-fill: -lanterna;
 }
 
 .descrizione {
     -fx-font-size: 14px;
-    -fx-text-fill: -colore-testo-tenue;
+    -fx-text-fill: -pietra-lunare;
 }
 
-/* La scheda di un combattente (nome, punti vita): l'eroe in chiaro, il nemico in rosso. */
+/* Le schede dei combattenti: l'eroe nel bianco freddo della luna, il nemico nel
+   colore della fiamma, che e' anche il colore del pericolo. */
 .scheda-eroe {
     -fx-font-size: 14px;
-    -fx-text-fill: -colore-testo;
+    -fx-text-fill: -luna;
 }
 
 .scheda-nemico {
     -fx-font-size: 14px;
-    -fx-text-fill: -colore-sangue;
+    -fx-text-fill: -torcia;
     -fx-font-weight: bold;
 }
 
 .messaggio {
     -fx-font-style: italic;
-    -fx-text-fill: -colore-testo-tenue;
+    -fx-text-fill: -pietra-lunare;
 }
 
 .esito {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-text-fill: -colore-oro;
+    -fx-text-fill: -lanterna;
 }
 
 /* --- Pulsanti ------------------------------------------------------------- */
 
+/* A riposo: legno scuro e bordo di pietra lunare. */
 .button {
-    -fx-background-color: -colore-fondo-chiaro;
-    -fx-text-fill: -colore-testo;
-    -fx-border-color: -colore-bordo;
+    -fx-background-color: -legno;
+    -fx-text-fill: -luna;
+    -fx-border-color: -pietra-lunare;
     -fx-border-width: 1px;
     -fx-border-radius: 3px;
     -fx-background-radius: 3px;
@@ -99,90 +102,91 @@
     -fx-cursor: hand;
 }
 
-/* Il pulsante sotto il puntatore si accende d'oro: si capisce dove si sta per premere. */
+/* Il pulsante sotto il puntatore si accende come una lanterna: si capisce dove si
+   sta per premere. */
 .button:hover {
-    -fx-border-color: -colore-oro;
-    -fx-text-fill: -colore-oro;
+    -fx-border-color: -lanterna;
+    -fx-text-fill: -lanterna;
 }
 
 /* Un pulsante spento e' un'azione impossibile adesso (un muro, una pozione finita):
    deve sembrare inerte, non invitante. */
 .button:disabled {
-    -fx-opacity: 0.35;
+    -fx-opacity: 0.3;
     -fx-cursor: default;
 }
 
-/* L'azione pericolosa: attaccare. */
+/* L'azione pericolosa: attaccare. Colore della fiamma. */
 .button-attacco {
-    -fx-border-color: -colore-sangue;
+    -fx-border-color: -torcia;
 }
 
 .button-attacco:hover {
-    -fx-background-color: -colore-sangue;
-    -fx-text-fill: -colore-testo;
-    -fx-border-color: -colore-sangue;
+    -fx-background-color: -torcia;
+    -fx-text-fill: -ombra;
+    -fx-border-color: -torcia;
 }
 
-/* L'azione che rimette in sesto: bere una pozione. */
+/* L'azione che rimette in sesto: bere una pozione. Colore dell'edera. */
 .button-cura {
-    -fx-border-color: -colore-cura;
+    -fx-border-color: -edera;
 }
 
 .button-cura:hover {
-    -fx-background-color: -colore-cura;
-    -fx-text-fill: -colore-testo;
-    -fx-border-color: -colore-cura;
+    -fx-background-color: -edera;
+    -fx-text-fill: -luna;
+    -fx-border-color: -edera;
 }
 
 /* --- Barre della vita ------------------------------------------------------ */
 
 .progress-bar {
     -fx-pref-height: 14px;
-    -fx-background-color: -colore-fondo-chiaro;
-    -fx-border-color: -colore-bordo;
+    -fx-background-color: transparent;
+    -fx-border-color: -pietra-lunare;
     -fx-border-radius: 3px;
 }
 
 .progress-bar > .track {
-    -fx-background-color: #14100e;
+    -fx-background-color: -ombra;
     -fx-background-radius: 2px;
 }
 
 /* Il colore della barra racconta la situazione a colpo d'occhio, senza leggere i
-   numeri: piena = verde, sotto meta' = oro, agli sgoccioli = sangue.
+   numeri: in forze = edera, a meta' = lanterna, agli sgoccioli = torcia.
    E' il controller a scegliere quale di queste classi applicare. */
 .barra-vita > .bar {
-    -fx-background-color: -colore-cura;
+    -fx-background-color: -edera;
     -fx-background-insets: 1px;
     -fx-background-radius: 2px;
 }
 
 .barra-vita-media > .bar {
-    -fx-background-color: -colore-oro;
+    -fx-background-color: -lanterna;
 }
 
 .barra-vita-bassa > .bar {
-    -fx-background-color: -colore-sangue;
+    -fx-background-color: -torcia;
 }
 
 /* --- Diario del combattimento ---------------------------------------------- */
 
-/* Il racconto dei colpi: una pergamena scura, di sola lettura. */
+/* Il racconto dei colpi, letto alla luce di una torcia: fondo d'ombra, testo chiaro. */
 .diario {
     -fx-font-family: "Consolas", monospace;
     -fx-font-size: 12px;
-    -fx-control-inner-background: #14100e;
-    -fx-text-fill: -colore-testo;
-    -fx-highlight-fill: -colore-bordo;
-    -fx-border-color: -colore-bordo;
+    -fx-control-inner-background: -ombra;
+    -fx-text-fill: -luna;
+    -fx-highlight-fill: -notte;
+    -fx-border-color: -pietra-lunare;
     -fx-border-radius: 3px;
 }
 
 .diario .content {
-    -fx-background-color: #14100e;
+    -fx-background-color: -ombra;
 }
 
 .separator *.line {
-    -fx-border-color: -colore-bordo;
+    -fx-border-color: -pietra-lunare;
     -fx-border-width: 1px 0 0 0;
 }
