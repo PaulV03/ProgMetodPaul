@@ -1,10 +1,10 @@
 package it.unicam.cs.mpgc.rpg123442;
 
-import it.unicam.cs.mpgc.rpg123442.model.character.Eroe;
-import it.unicam.cs.mpgc.rpg123442.model.character.Statistiche;
 import it.unicam.cs.mpgc.rpg123442.service.GameEngine;
-import it.unicam.cs.mpgc.rpg123442.service.MondoFactory;
+import it.unicam.cs.mpgc.rpg123442.service.PartitaFactory;
+import it.unicam.cs.mpgc.rpg123442.ui.CombattimentoController;
 import it.unicam.cs.mpgc.rpg123442.ui.EsplorazioneController;
+import it.unicam.cs.mpgc.rpg123442.ui.Navigazione;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -23,26 +23,37 @@ import java.net.URL;
 /**
  * Punto di ingresso dell'applicazione: la finestra JavaFX del gioco.
  *
- * <p>Mostra un <b>menu iniziale</b>; il pulsante "Nuova Partita" assembla una
- * partita ({@link MondoFactory} per il mondo, un eroe di default) e apre lo
- * schermo di esplorazione descritto in <code>esplorazione.fxml</code>.
+ * <p>Ha due responsabilita', entrambe di <b>montaggio</b>: assemblare la partita
+ * (delegando a {@link PartitaFactory}) e mostrare la schermata giusta al momento
+ * giusto. Non conosce le regole del gioco (stanno nel motore) ne' com'e' disegnata
+ * una schermata (sta nei file FXML).
  *
- * <p>La sua responsabilita' e' quella di <b>montatore</b>: costruisce gli oggetti
- * del dominio e li consegna alla schermata giusta. Non conosce le regole del
- * gioco (stanno nel motore) ne' come e' disegnata una schermata (sta nell'FXML).
+ * <p>Implementa {@link Navigazione}: sono i controller a chiedere il cambio di
+ * schermata, ma senza conoscere questa classe. Loro dicono <i>dove</i> andare,
+ * qui si decide <i>come</i> arrivarci.
  */
-public class App extends Application {
+public class App extends Application implements Navigazione {
 
     private static final String TITOLO = "RPG a turni";
+    private static final String NOME_EROE_DEFAULT = "Eroe";
 
-    /** Percorso dello schermo di esplorazione, dentro le risorse del progetto. */
+    /** Le schermate del gioco, dentro le risorse del progetto. */
     private static final String FXML_ESPLORAZIONE =
             "/it/unicam/cs/mpgc/rpg123442/ui/esplorazione.fxml";
+    private static final String FXML_COMBATTIMENTO =
+            "/it/unicam/cs/mpgc/rpg123442/ui/combattimento.fxml";
+
+    /** La finestra su cui si avvicendano le schermate. */
+    private Stage stage;
+
+    /** La partita in corso: nasce con "Nuova Partita" e sopravvive ai cambi di schermata. */
+    private GameEngine partita;
 
     @Override
     public void start(Stage stage) {
+        this.stage = stage;
         stage.setTitle(TITOLO);
-        stage.setScene(menuIniziale(stage));
+        stage.setScene(menuIniziale());
         stage.show();
     }
 
@@ -50,12 +61,12 @@ public class App extends Application {
      * Costruisce la scena del menu iniziale: titolo del gioco piu' i pulsanti per
      * iniziare o uscire.
      */
-    private Scene menuIniziale(Stage stage) {
+    private Scene menuIniziale() {
         Label titolo = new Label(TITOLO);
         titolo.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
         Button nuovaPartita = new Button("Nuova Partita");
-        nuovaPartita.setOnAction(e -> stage.setScene(schermoPartita()));
+        nuovaPartita.setOnAction(e -> iniziaNuovaPartita());
 
         Button esci = new Button("Esci");
         esci.setOnAction(e -> stage.close());
@@ -67,36 +78,49 @@ public class App extends Application {
     }
 
     /**
-     * Avvia una nuova partita e ne apre lo schermo di esplorazione.
+     * Crea una partita nuova di zecca e apre il mondo.
      */
-    private Scene schermoPartita() {
-        Eroe eroe = new Eroe("Eroe", new Statistiche(30, 10, 4));
-        GameEngine partita = new GameEngine(eroe, MondoFactory.creaMondoDiDefault());
-        return new Scene(caricaEsplorazione(partita));
+    private void iniziaNuovaPartita() {
+        this.partita = PartitaFactory.creaNuovaPartita(NOME_EROE_DEFAULT);
+        mostraEsplorazione();
+    }
+
+    @Override
+    public void mostraEsplorazione() {
+        mostra(FXML_ESPLORAZIONE, new EsplorazioneController(partita, this));
+    }
+
+    @Override
+    public void mostraCombattimento() {
+        mostra(FXML_COMBATTIMENTO,
+                new CombattimentoController(partita.iniziaCombattimento(), this));
     }
 
     /**
-     * Carica lo schermo di esplorazione collegandolo alla partita indicata.
+     * Carica una schermata dal suo file FXML, la collega al controller indicato e
+     * la porta in scena.
      *
-     * <p>Il controller viene creato qui e passato al caricatore gia' pronto:
-     * per questo l'FXML non dichiara <code>fx:controller</code>. In cambio il
-     * controller riceve la partita nel costruttore e non puo' trovarsi senza.
+     * <p>Il controller viene creato qui e consegnato gia' pronto al caricatore: per
+     * questo i file FXML non dichiarano <code>fx:controller</code>. In cambio ogni
+     * controller riceve nel costruttore tutto cio' che gli serve, e non puo' trovarsi
+     * a meta' strada.
      *
-     * @throws UncheckedIOException se il file FXML manca o e' malformato: sarebbe
-     *         un errore di programmazione, non una situazione che l'utente possa
+     * @throws UncheckedIOException se il file FXML manca o e' malformato: sarebbe un
+     *         errore di programmazione, non una situazione che l'utente possa
      *         correggere, quindi non ha senso obbligare chi chiama a gestirlo
      */
-    private Parent caricaEsplorazione(GameEngine partita) {
-        URL risorsa = App.class.getResource(FXML_ESPLORAZIONE);
+    private void mostra(String percorsoFxml, Object controller) {
+        URL risorsa = App.class.getResource(percorsoFxml);
         if (risorsa == null) {
-            throw new IllegalStateException("Schermata non trovata: " + FXML_ESPLORAZIONE);
+            throw new IllegalStateException("Schermata non trovata: " + percorsoFxml);
         }
         FXMLLoader caricatore = new FXMLLoader(risorsa);
-        caricatore.setController(new EsplorazioneController(partita));
+        caricatore.setController(controller);
         try {
-            return caricatore.load();
+            Parent radice = caricatore.load();
+            stage.setScene(new Scene(radice));
         } catch (IOException e) {
-            throw new UncheckedIOException("Impossibile caricare " + FXML_ESPLORAZIONE, e);
+            throw new UncheckedIOException("Impossibile caricare " + percorsoFxml, e);
         }
     }
 

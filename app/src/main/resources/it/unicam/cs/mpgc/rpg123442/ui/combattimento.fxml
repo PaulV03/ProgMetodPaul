@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+    Schermo di combattimento: come per l'esplorazione, qui c'e' solo l'ASPETTO.
+    Le azioni vivono in CombattimentoController, collegato tramite gli fx:id
+    (i campi da riempire) e gli onAction (i metodi da chiamare al click).
+
+    Anche qui niente fx:controller: il controller viene costruito dall'applicazione
+    con lo scontro gia' in corso, e passato al caricatore.
+-->
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      alignment="CENTER"
+      spacing="12.0"
+      prefWidth="480.0"
+      prefHeight="360.0">
+
+    <padding>
+        <Insets top="30.0" right="30.0" bottom="30.0" left="30.0"/>
+    </padding>
+
+    <Label fx:id="titolo" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <Label fx:id="statoNemico"/>
+    <Label fx:id="statoEroe"/>
+
+    <Separator/>
+
+    <!-- Il resoconto dei colpi, turno dopo turno. Di sola lettura: e' un racconto,
+         non un campo da compilare. -->
+    <TextArea fx:id="diario" editable="false" focusTraversable="false"
+              prefRowCount="6" wrapText="true"/>
+
+    <Label fx:id="esito" wrapText="true" style="-fx-font-weight: bold;"/>
+
+    <!-- Le azioni del giocatore. Il controller abilita solo quelle possibili:
+         niente attacchi a scontro finito, niente pozioni se non ne restano. -->
+    <HBox alignment="CENTER" spacing="8.0">
+        <Button fx:id="bottoneAttacca" text="Attacca" onAction="#attacca" defaultButton="true"/>
+        <Button fx:id="bottonePozione" text="Usa pozione" onAction="#usaPozione"/>
+        <Button fx:id="bottoneContinua" text="Continua" onAction="#continua"/>
+    </HBox>
+
+</VBox>

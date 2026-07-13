@@ -31,6 +31,9 @@
     <Label fx:id="descrizioneStanza" wrapText="true"/>
     <Label fx:id="statoNemico"/>
 
+    <!-- Attivo solo quando la stanza e' sorvegliata: non si attacca il vuoto. -->
+    <Button fx:id="bottoneCombatti" text="Combatti!" onAction="#combatti"/>
+
     <Separator/>
 
     <!-- Le quattro direzioni. Ogni pulsante viene abilitato o disabilitato dal

@@ -28,6 +28,7 @@ import java.util.Map;
 public class EsplorazioneController {
 
     private final GameEngine partita;
+    private final Navigazione navigazione;
 
     @FXML private Label nomeStanza;
     @FXML private Label descrizioneStanza;
@@ -39,18 +40,21 @@ public class EsplorazioneController {
     @FXML private Button bottoneSud;
     @FXML private Button bottoneEst;
     @FXML private Button bottoneOvest;
+    @FXML private Button bottoneCombatti;
 
     /** Associa ogni direzione al pulsante che la comanda: evita quattro casi ripetuti. */
     private Map<Direzione, Button> bottoniPerDirezione;
 
     /**
-     * @param partita la partita da mostrare e comandare (non null)
+     * @param partita     la partita da mostrare e comandare (non null)
+     * @param navigazione a chi chiedere l'apertura di un'altra schermata (non null)
      */
-    public EsplorazioneController(GameEngine partita) {
-        if (partita == null) {
-            throw new IllegalArgumentException("La partita non puo' essere null");
+    public EsplorazioneController(GameEngine partita, Navigazione navigazione) {
+        if (partita == null || navigazione == null) {
+            throw new IllegalArgumentException("Partita e navigazione non possono essere null");
         }
         this.partita = partita;
+        this.navigazione = navigazione;
     }
 
     /**
@@ -74,6 +78,18 @@ public class EsplorazioneController {
     @FXML private void vaiSud() { muoviVerso(Direzione.SUD); }
     @FXML private void vaiEst() { muoviVerso(Direzione.EST); }
     @FXML private void vaiOvest() { muoviVerso(Direzione.OVEST); }
+
+    /**
+     * Affronta il nemico della stanza corrente, aprendo lo schermo di combattimento.
+     *
+     * <p>Il pulsante e' abilitato solo dove c'e' un nemico, quindi non serve un
+     * controllo qui: e' {@link #aggiornaVista()} a garantire che questa azione sia
+     * proponibile solo quando ha senso.
+     */
+    @FXML
+    private void combatti() {
+        navigazione.mostraCombattimento();
+    }
 
     /**
      * Tenta lo spostamento e aggiorna la schermata di conseguenza.
@@ -106,6 +122,9 @@ public class EsplorazioneController {
         // Un pulsante e' attivo solo se dalla stanza corrente si esce da quella parte.
         bottoniPerDirezione.forEach(
                 (direzione, bottone) -> bottone.setDisable(!stanza.haUscita(direzione)));
+
+        // Si combatte solo dove c'e' qualcuno da combattere.
+        bottoneCombatti.setDisable(!stanza.haNemico());
     }
 
     private String descriviNemico(Stanza stanza) {
