@@ -58,14 +58,38 @@ class EsplorazioneControllerTest {
         return attivita.get(10, TimeUnit.SECONDS);
     }
 
+    /**
+     * Una navigazione finta: non apre nessuna schermata, si limita ad annotare che
+     * gliel'hanno chiesta. Basta questo per verificare che il controller chieda la
+     * cosa giusta al momento giusto, senza tirare in ballo l'applicazione vera.
+     * E' possibile perche' il controller dipende dall'interfaccia {@link Navigazione}.
+     */
+    private static final class NavigazioneFinta implements Navigazione {
+        private boolean combattimentoChiesto;
+
+        @Override
+        public void mostraEsplorazione() {
+            // niente da fare: qui non si disegna nulla
+        }
+
+        @Override
+        public void mostraCombattimento() {
+            combattimentoChiesto = true;
+        }
+    }
+
     /** Carica lo schermo di esplorazione per una nuova partita nel mondo di default. */
-    private static Parent caricaSchermo() throws Exception {
+    private static Parent caricaSchermo(Navigazione navigazione) throws Exception {
         GameEngine partita = new GameEngine(
                 new Eroe("Eroe", new Statistiche(30, 10, 4)),
                 MondoFactory.creaMondoDiDefault());
         FXMLLoader caricatore = new FXMLLoader(EsplorazioneControllerTest.class.getResource(FXML));
-        caricatore.setController(new EsplorazioneController(partita));
+        caricatore.setController(new EsplorazioneController(partita, navigazione));
         return caricatore.load();
+    }
+
+    private static Parent caricaSchermo() throws Exception {
+        return caricaSchermo(new NavigazioneFinta());
     }
 
     private static String testoDi(Parent radice, String fxId) {
@@ -117,5 +141,36 @@ class EsplorazioneControllerTest {
                 () -> assertTrue(testoDi(radice, "messaggio").contains("Est")),
                 // Tornando indietro si rientra nell'Ingresso: il collegamento e' bidirezionale.
                 () -> assertFalse(bottone(radice, "bottoneOvest").isDisabled()));
+    }
+
+    @Test
+    @DisplayName("si puo' combattere solo dove c'e' un nemico")
+    void siCombatteSoloDoveCEUnNemico() throws Exception {
+        Parent radice = sulThreadGrafico(EsplorazioneControllerTest::caricaSchermo);
+
+        // L'Ingresso e' tranquillo: niente da attaccare.
+        assertTrue(bottone(radice, "bottoneCombatti").isDisabled());
+
+        sulThreadGrafico(() -> {
+            bottone(radice, "bottoneEst").fire(); // nel Corridoio c'e' il Goblin
+            return null;
+        });
+
+        assertFalse(bottone(radice, "bottoneCombatti").isDisabled());
+    }
+
+    @Test
+    @DisplayName("premere Combatti chiede lo schermo di combattimento")
+    void premereCombattiChiedeLoSchermoDiCombattimento() throws Exception {
+        NavigazioneFinta navigazione = new NavigazioneFinta();
+        Parent radice = sulThreadGrafico(() -> caricaSchermo(navigazione));
+
+        sulThreadGrafico(() -> {
+            bottone(radice, "bottoneEst").fire(); // raggiunge il Goblin
+            bottone(radice, "bottoneCombatti").fire();
+            return null;
+        });
+
+        assertTrue(navigazione.combattimentoChiesto);
     }
 }
