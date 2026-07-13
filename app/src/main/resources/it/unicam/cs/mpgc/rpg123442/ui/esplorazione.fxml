@@ -54,4 +54,11 @@
     <ProgressBar fx:id="barraEroe" styleClass="barra-vita" prefWidth="240.0" progress="1.0"/>
     <Label fx:id="messaggio" styleClass="messaggio" wrapText="true"/>
 
+    <!-- Il viaggio si puo' interrompere e riprendere. Sempre disponibili: si salva
+         quando si vuole, non solo dove il gioco lo concede. -->
+    <HBox alignment="CENTER" spacing="8.0">
+        <Button fx:id="bottoneSalva" text="Salva" onAction="#salva"/>
+        <Button fx:id="bottoneCarica" text="Carica" onAction="#carica"/>
+    </HBox>
+
 </VBox>

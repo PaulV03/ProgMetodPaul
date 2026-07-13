@@ -1,11 +1,15 @@
 package it.unicam.cs.mpgc.rpg123442;
 
+import it.unicam.cs.mpgc.rpg123442.repository.GameSaveRepository;
+import it.unicam.cs.mpgc.rpg123442.repository.JsonGameSaveRepository;
+import it.unicam.cs.mpgc.rpg123442.repository.PersistenzaException;
 import it.unicam.cs.mpgc.rpg123442.service.GameEngine;
 import it.unicam.cs.mpgc.rpg123442.service.PartitaFactory;
 import it.unicam.cs.mpgc.rpg123442.service.StatoPartita;
 import it.unicam.cs.mpgc.rpg123442.ui.CombattimentoController;
 import it.unicam.cs.mpgc.rpg123442.ui.EsplorazioneController;
 import it.unicam.cs.mpgc.rpg123442.ui.FineController;
+import it.unicam.cs.mpgc.rpg123442.ui.GestioneSalvataggi;
 import it.unicam.cs.mpgc.rpg123442.ui.Navigazione;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -13,14 +17,19 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * Punto di ingresso dell'applicazione: la finestra JavaFX del gioco.
@@ -34,10 +43,13 @@ import java.net.URL;
  * schermata, ma senza conoscere questa classe. Loro dicono <i>dove</i> andare,
  * qui si decide <i>come</i> arrivarci.
  */
-public class App extends Application implements Navigazione {
+public class App extends Application implements Navigazione, GestioneSalvataggi {
 
     private static final String TITOLO = "RPG a turni";
     private static final String NOME_EROE_DEFAULT = "Eroe";
+
+    /** Come si chiama un salvataggio, se il giocatore non decide altrimenti. */
+    private static final String SALVATAGGIO_PREDEFINITO = "partita.json";
 
     private static final int LARGHEZZA = 560;
     private static final int ALTEZZA = 460;
@@ -58,6 +70,16 @@ public class App extends Application implements Navigazione {
 
     /** La partita in corso: nasce con "Nuova Partita" e sopravvive ai cambi di schermata. */
     private GameEngine partita;
+
+    /**
+     * Dove finiscono le partite salvate.
+     *
+     * <p>Il campo e' dichiarato del <b>tipo dell'interfaccia</b> e non della classe
+     * concreta: qui si sa soltanto che una partita si puo' salvare e ricaricare, non
+     * che lo si stia facendo in JSON. Passare a un altro formato — XML, un database —
+     * significherebbe cambiare questa sola riga (DIP).
+     */
+    private final GameSaveRepository salvataggi = new JsonGameSaveRepository();
 
     @Override
     public void start(Stage stage) {
@@ -82,11 +104,16 @@ public class App extends Application implements Navigazione {
         nuovaPartita.setOnAction(e -> iniziaNuovaPartita());
         nuovaPartita.setPrefWidth(200);
 
+        // Si riprende un'avventura anche da qui, senza doverne prima cominciare una.
+        Button caricaPartita = new Button("Carica Partita");
+        caricaPartita.setOnAction(e -> caricaPartita());
+        caricaPartita.setPrefWidth(200);
+
         Button esci = new Button("Esci");
         esci.setOnAction(e -> stage.close());
         esci.setPrefWidth(200);
 
-        VBox radice = new VBox(15, titolo, sottotitolo, nuovaPartita, esci);
+        VBox radice = new VBox(15, titolo, sottotitolo, nuovaPartita, caricaPartita, esci);
         radice.getStyleClass().add("schermo");
         radice.setAlignment(Pos.CENTER);
         radice.setPadding(new Insets(40));
@@ -135,7 +162,7 @@ public class App extends Application implements Navigazione {
             mostra(FXML_FINE, new FineController(partita, this));
             return;
         }
-        mostra(FXML_ESPLORAZIONE, new EsplorazioneController(partita, this));
+        mostra(FXML_ESPLORAZIONE, new EsplorazioneController(partita, this, this));
     }
 
     @Override
@@ -152,6 +179,77 @@ public class App extends Application implements Navigazione {
     public void mostraMenuIniziale() {
         this.partita = null;
         stage.setScene(menuIniziale());
+    }
+
+    /**
+     * Scrive la partita in corso nel file scelto dal giocatore.
+     *
+     * <p>Se il dialogo viene annullato non succede niente: e' una scelta legittima,
+     * non un errore. Se invece la scrittura fallisce (permessi, disco pieno, percorso
+     * inesistente) il repository solleva {@link PersistenzaException} e la si mostra
+     * come un avviso: un salvataggio non riuscito non e' un buon motivo per far
+     * chiudere il gioco e perdere la partita.
+     */
+    @Override
+    public void salvaPartita() {
+        scegliFile("Salva la partita", true).ifPresent(percorso -> {
+            try {
+                salvataggi.salva(partita, percorso);
+                avviso(Alert.AlertType.INFORMATION, "Partita salvata in:\n" + percorso);
+            } catch (PersistenzaException fallita) {
+                avviso(Alert.AlertType.ERROR, "Non e' stato possibile salvare.\n"
+                        + fallita.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Riprende una partita da un salvataggio, sostituendo quella eventualmente in
+     * corso, e riapre il mondo dove il giocatore l'aveva lasciato.
+     *
+     * <p>Se il file non e' un salvataggio valido, la partita corrente resta intatta:
+     * si assegna il campo <b>solo dopo</b> che il caricamento e' riuscito.
+     */
+    @Override
+    public void caricaPartita() {
+        scegliFile("Carica una partita", false).ifPresent(percorso -> {
+            try {
+                this.partita = salvataggi.carica(percorso);
+                mostraEsplorazione();
+            } catch (PersistenzaException fallita) {
+                avviso(Alert.AlertType.ERROR, "Non e' stato possibile caricare.\n"
+                        + fallita.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Apre il dialogo dei file e restituisce il percorso scelto.
+     *
+     * @param titolo      l'intestazione della finestra
+     * @param inScrittura vero per scegliere dove scrivere, falso per scegliere cosa leggere
+     * @return il percorso scelto, oppure {@link Optional#empty()} se il giocatore
+     *         ha annullato: annullare e' una risposta, non un guasto
+     */
+    private Optional<Path> scegliFile(String titolo, boolean inScrittura) {
+        FileChooser dialogo = new FileChooser();
+        dialogo.setTitle(titolo);
+        dialogo.setInitialFileName(SALVATAGGIO_PREDEFINITO);
+        dialogo.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Partite salvate (*.json)", "*.json"));
+
+        File scelto = inScrittura
+                ? dialogo.showSaveDialog(stage)
+                : dialogo.showOpenDialog(stage);
+        return Optional.ofNullable(scelto).map(File::toPath);
+    }
+
+    /** Mostra un messaggio al giocatore e attende che lo abbia letto. */
+    private void avviso(Alert.AlertType tipo, String messaggio) {
+        Alert finestra = new Alert(tipo, messaggio);
+        finestra.initOwner(stage);
+        finestra.setHeaderText(null);
+        finestra.showAndWait();
     }
 
     /**

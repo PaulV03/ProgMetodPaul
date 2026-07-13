@@ -30,6 +30,7 @@ public class EsplorazioneController {
 
     private final GameEngine partita;
     private final Navigazione navigazione;
+    private final GestioneSalvataggi salvataggi;
 
     @FXML private Label nomeStanza;
     @FXML private Label descrizioneStanza;
@@ -51,13 +52,18 @@ public class EsplorazioneController {
     /**
      * @param partita     la partita da mostrare e comandare (non null)
      * @param navigazione a chi chiedere l'apertura di un'altra schermata (non null)
+     * @param salvataggi  a chi chiedere di salvare o riprendere una partita (non null)
      */
-    public EsplorazioneController(GameEngine partita, Navigazione navigazione) {
-        if (partita == null || navigazione == null) {
-            throw new IllegalArgumentException("Partita e navigazione non possono essere null");
+    public EsplorazioneController(GameEngine partita,
+                                  Navigazione navigazione,
+                                  GestioneSalvataggi salvataggi) {
+        if (partita == null || navigazione == null || salvataggi == null) {
+            throw new IllegalArgumentException(
+                    "Partita, navigazione e salvataggi non possono essere null");
         }
         this.partita = partita;
         this.navigazione = navigazione;
+        this.salvataggi = salvataggi;
     }
 
     /**
@@ -92,6 +98,30 @@ public class EsplorazioneController {
     @FXML
     private void combatti() {
         navigazione.mostraCombattimento();
+    }
+
+    /**
+     * Mette da parte la partita.
+     *
+     * <p>Questo controller non sa dove finisca il file ne' in che formato: apre un
+     * dialogo, scrive il JSON e riferisce l'eventuale errore chi implementa
+     * {@link GestioneSalvataggi}. Qui c'e' solo la richiesta.
+     */
+    @FXML
+    private void salva() {
+        salvataggi.salvaPartita();
+    }
+
+    /**
+     * Riprende una partita salvata, abbandonando quella in corso.
+     *
+     * <p>La partita caricata e' un'altra: non basta ridisegnare questa schermata,
+     * va riaperta su quella nuova. Se ne occupa chi implementa
+     * {@link GestioneSalvataggi}, che la partita corrente ce l'ha in mano.
+     */
+    @FXML
+    private void carica() {
+        salvataggi.caricaPartita();
     }
 
     /**
