@@ -27,6 +27,10 @@ import java.util.Optional;
  */
 public class CombattimentoController {
 
+    /** Le classi CSS con cui l'esito si tinge di vittoria o di sconfitta. */
+    private static final String CLASSE_VITTORIA = "esito-vittoria";
+    private static final String CLASSE_SCONFITTA = "esito-sconfitta";
+
     private final SessioneCombattimento scontro;
     private final Navigazione navigazione;
 
@@ -124,6 +128,7 @@ public class CombattimentoController {
         statoNemico.setText(descrivi(scontro.getNemico()));
         statoEroe.setText(descriviEroe(scontro.getEroe()));
         esito.setText(descriviEsito());
+        coloraEsito();
 
         BarraVita.aggiorna(barraNemico, scontro.getNemico());
         BarraVita.aggiorna(barraEroe, scontro.getEroe());
@@ -132,6 +137,21 @@ public class CombattimentoController {
         bottoneAttacca.setDisable(finito);
         bottonePozione.setDisable(finito || primoConsumabile().isEmpty());
         bottoneContinua.setDisable(!finito); // si prosegue solo a scontro concluso
+    }
+
+    /**
+     * Tinge l'esito di verde o di rosso a seconda di come sia andata.
+     *
+     * <p>Il controller sceglie la <b>classe</b> ("vittoria", "sconfitta"), non il
+     * colore: quale verde e quale rosso lo decide <code>stile.css</code>. Cosi' la
+     * palette resta un fatto di aspetto, e non si infila nel codice Java.
+     */
+    private void coloraEsito() {
+        esito.getStyleClass().removeAll(CLASSE_VITTORIA, CLASSE_SCONFITTA);
+        if (!scontro.isFinito()) {
+            return;
+        }
+        esito.getStyleClass().add(scontro.eroeVincitore() ? CLASSE_VITTORIA : CLASSE_SCONFITTA);
     }
 
     private String descriviEsito() {

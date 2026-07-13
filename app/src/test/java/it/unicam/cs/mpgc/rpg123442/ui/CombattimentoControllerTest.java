@@ -188,6 +188,8 @@ class CombattimentoControllerTest {
 
         assertAll(
                 () -> assertTrue(testoDi(radice, "esito").contains("vinto")),
+                () -> assertTrue(radice.lookup("#esito").getStyleClass().contains("esito-vittoria"),
+                        "l'esito deve tingersi del colore della vittoria"),
                 () -> assertTrue(bottone(radice, "bottoneAttacca").isDisabled()),
                 () -> assertTrue(bottone(radice, "bottonePozione").isDisabled()),
                 () -> assertFalse(bottone(radice, "bottoneContinua").isDisabled()));

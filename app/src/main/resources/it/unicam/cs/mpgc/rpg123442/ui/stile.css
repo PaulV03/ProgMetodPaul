@@ -1,100 +1,141 @@
 /*
- * Aspetto del gioco: colori, spaziature, caratteri.
+ * Aspetto del gioco: colori, caratteri, spaziature.
  *
  * Sta qui e non nel codice Java per la stessa ragione per cui la struttura delle
  * schermate sta nei file FXML: sono tre cose diverse e vanno cambiate
  * indipendentemente. Un ritocco alla palette non deve far ricompilare nulla, e
  * un controller non deve sapere di che colore e' un pulsante.
  *
- * Palette "castello di notte": pietra d'antracite e ombre nere, il blu della notte
- * lunare, le fiamme delle torce e il giallo caldo delle lanterne. Nel resto del
- * foglio i colori si usano sempre per il loro RUOLO (la torcia = il pericolo,
- * l'edera = la cura): per ricolorare il gioco basta percio' cambiare il blocco
- * qui sotto.
+ * I colori sono dichiarati una volta sola qui sotto e poi richiamati per NOME:
+ * il resto del foglio parla di "-oro" o di "-attacco", mai di codici esadecimali.
+ * Ricolorare il gioco significa percio' toccare solo questo primo blocco.
+ *
+ * I caratteri sono due, come nei libri: uno da titolo, inciso, e uno da leggere.
  */
 .root {
-    -pietra: #2f3438;          /* grigio antracite: mura, pavimento, scale */
-    -ombra: #101317;           /* nero: ombre profonde, cancelli, cielo notturno */
-    -notte: #1b2a44;           /* blu notte: il cielo illuminato dalla luna */
-    -pietra-lunare: #6d7d8c;   /* blu-grigio: riflessi lunari sulla pietra */
-    -torcia: #e0701d;          /* arancione intenso: la fiamma delle torce */
-    -lanterna: #edc55a;        /* giallo dorato: lanterne e finestre illuminate */
-    -legno: #3a2a1d;           /* marrone scuro: botti e travi */
-    -edera: #3f7a4c;           /* verde scuro: l'edera sulle mura */
-    -luna: #eef3f8;            /* bianco freddo: la luna e i riflessi piu' vivi */
+    /* Fondi: la pietra del castello e la notte. */
+    -fondo: #1C1F24;           /* grigio pietra molto scuro: lo sfondo dominante */
+    -alone: #2A3345;           /* blu notte: la luce lunare al centro della scena */
+    -fondo-diario: #2B2B2B;    /* pietra scura: il riquadro del racconto */
 
-    -fx-font-family: "Georgia", "Cambria", serif;
-    -fx-background-color: -ombra;
+    /* Testi. */
+    -oro: #D6B86A;             /* oro antico: il nome del gioco */
+    -avorio: #F1E4C6;          /* avorio caldo: i titoli di schermata */
+    -pergamena: #E7DDC7;       /* pergamena chiara: il testo da leggere */
+    -tenue: #A9A59B;           /* grigio chiaro: messaggi e sottotitoli */
+    -eroe: #87C38F;            /* verde salvia: la scheda dell'eroe */
+    -nemico: #C95A5A;          /* rosso cremisi: la scheda del nemico */
+
+    /* Esiti. */
+    -vittoria: #59C36A;
+    -sconfitta: #D14A4A;
+
+    /* Pulsanti. */
+    -pulsante: #3A404A;        /* grigio ardesia: il pulsante a riposo */
+    -bronzo: #B58A45;          /* bronzo: bordo e testo del pulsante */
+    -oro-acceso: #E0B84E;      /* oro acceso: il pulsante sotto il puntatore */
+    -attacco: #9B2D30;         /* rosso scuro: l'azione offensiva */
+    -cura: #2F8F5A;            /* verde smeraldo: l'azione che rimette in sesto */
+
+    /* Barra della vita: dal pieno al critico. */
+    -vita-piena: #4CAF50;
+    -vita-media: #F4A62A;
+    -vita-critica: #D32F2F;
+
+    /* Dettagli. */
+    -bordo: #5A5E66;           /* pietra chiara: bordi e linee di separazione */
+
+    /* Il carattere da lettura: e' quello di base, lo eredita tutto lo schermo. */
+    -fx-font-family: "Constantia", "Cambria", "Georgia", serif;
+    -fx-background-color: -fondo;
 }
 
-/* Ogni schermata: la pietra del castello sotto un cielo blu notte, con il buio
-   che si addensa verso i bordi. */
+/* Ogni schermata: la pietra scura, rischiarata al centro dal blu della notte. */
 .schermo {
-    -fx-background-color: radial-gradient(center 50% 25%, radius 75%,
-                          -notte 0%, -pietra 45%, -ombra 100%);
+    -fx-background-color: radial-gradient(center 50% 30%, radius 75%,
+                          -alone 0%, -fondo 100%);
 }
 
 .label {
-    -fx-text-fill: -luna;
+    -fx-text-fill: -pergamena;
 }
 
-/* Il nome del gioco nel menu: la luce calda di una lanterna nel buio. */
+/* --- Titoli ---------------------------------------------------------------- */
+
+/* I titoli hanno un carattere loro: il Palatino, il piu' vicino fra quelli di
+   sistema alle capitali romane incise nella pietra. Il testo da leggere usa invece
+   il carattere di base, piu' riposante sulle righe lunghe. */
 .titolo-gioco {
-    -fx-font-size: 42px;
+    -fx-font-family: "Palatino Linotype", "Book Antiqua", "Palatino", serif;
+    -fx-font-size: 40px;
     -fx-font-weight: bold;
-    -fx-text-fill: -lanterna;
-    -fx-effect: dropshadow(gaussian, rgba(237, 197, 90, 0.35), 18, 0.2, 0, 0);
+    -fx-text-fill: -oro;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.85), 14, 0.3, 0, 3);
+}
+
+.titolo-schermo {
+    -fx-font-family: "Palatino Linotype", "Book Antiqua", "Palatino", serif;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -avorio;
 }
 
 .sottotitolo {
     -fx-font-size: 14px;
-    -fx-text-fill: -pietra-lunare;
+    -fx-text-fill: -tenue;
     -fx-font-style: italic;
 }
 
-/* Il titolo di una schermata: il nome della stanza, "Scontro!". */
-.titolo-schermo {
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -lanterna;
-}
+/* --- Testi ----------------------------------------------------------------- */
 
 .descrizione {
     -fx-font-size: 14px;
-    -fx-text-fill: -pietra-lunare;
-}
-
-/* Le schede dei combattenti: l'eroe nel bianco freddo della luna, il nemico nel
-   colore della fiamma, che e' anche il colore del pericolo. */
-.scheda-eroe {
-    -fx-font-size: 14px;
-    -fx-text-fill: -luna;
-}
-
-.scheda-nemico {
-    -fx-font-size: 14px;
-    -fx-text-fill: -torcia;
-    -fx-font-weight: bold;
+    -fx-text-fill: -pergamena;
 }
 
 .messaggio {
     -fx-font-style: italic;
-    -fx-text-fill: -pietra-lunare;
+    -fx-text-fill: -tenue;
 }
 
+/* Le schede dei due contendenti: l'eroe nel verde della salvia, il nemico nel
+   rosso del cremisi. Il colore dice da che parte si sta guardando. */
+.scheda-eroe {
+    -fx-font-size: 14px;
+    -fx-text-fill: -eroe;
+}
+
+.scheda-nemico {
+    -fx-font-size: 14px;
+    -fx-text-fill: -nemico;
+    -fx-font-weight: bold;
+}
+
+/* L'esito e' l'unica scritta che cambia colore secondo cio' che dice: verde se
+   hai vinto, rosso se sei caduto. E' il controller ad applicare la classe giusta. */
 .esito {
+    -fx-font-family: "Palatino Linotype", "Book Antiqua", "Palatino", serif;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-text-fill: -lanterna;
 }
 
-/* --- Pulsanti ------------------------------------------------------------- */
+.esito-vittoria {
+    -fx-text-fill: -vittoria;
+}
 
-/* A riposo: legno scuro e bordo di pietra lunare. */
+.esito-sconfitta {
+    -fx-text-fill: -sconfitta;
+}
+
+/* --- Pulsanti -------------------------------------------------------------- */
+
+/* Anche i pulsanti sono "incisi": e' il menu, ed e' la voce del gioco. */
 .button {
-    -fx-background-color: -legno;
-    -fx-text-fill: -luna;
-    -fx-border-color: -pietra-lunare;
+    -fx-font-family: "Palatino Linotype", "Book Antiqua", "Palatino", serif;
+    -fx-font-size: 13px;
+    -fx-background-color: -pulsante;
+    -fx-text-fill: -bronzo;
+    -fx-border-color: -bronzo;
     -fx-border-width: 1px;
     -fx-border-radius: 3px;
     -fx-background-radius: 3px;
@@ -102,11 +143,10 @@
     -fx-cursor: hand;
 }
 
-/* Il pulsante sotto il puntatore si accende come una lanterna: si capisce dove si
-   sta per premere. */
+/* Il pulsante sotto il puntatore si accende d'oro: si vede dove si sta per premere. */
 .button:hover {
-    -fx-border-color: -lanterna;
-    -fx-text-fill: -lanterna;
+    -fx-text-fill: -oro-acceso;
+    -fx-border-color: -oro-acceso;
 }
 
 /* Un pulsante spento e' un'azione impossibile adesso (un muro, una pozione finita):
@@ -116,26 +156,28 @@
     -fx-cursor: default;
 }
 
-/* L'azione pericolosa: attaccare. Colore della fiamma. */
+/* L'azione pericolosa: attaccare. */
 .button-attacco {
-    -fx-border-color: -torcia;
+    -fx-border-color: -attacco;
+    -fx-text-fill: -nemico;
 }
 
 .button-attacco:hover {
-    -fx-background-color: -torcia;
-    -fx-text-fill: -ombra;
-    -fx-border-color: -torcia;
+    -fx-background-color: -attacco;
+    -fx-text-fill: -pergamena;
+    -fx-border-color: -attacco;
 }
 
-/* L'azione che rimette in sesto: bere una pozione. Colore dell'edera. */
+/* L'azione che rimette in sesto: bere una pozione. */
 .button-cura {
-    -fx-border-color: -edera;
+    -fx-border-color: -cura;
+    -fx-text-fill: -eroe;
 }
 
 .button-cura:hover {
-    -fx-background-color: -edera;
-    -fx-text-fill: -luna;
-    -fx-border-color: -edera;
+    -fx-background-color: -cura;
+    -fx-text-fill: -pergamena;
+    -fx-border-color: -cura;
 }
 
 /* --- Barre della vita ------------------------------------------------------ */
@@ -143,50 +185,50 @@
 .progress-bar {
     -fx-pref-height: 14px;
     -fx-background-color: transparent;
-    -fx-border-color: -pietra-lunare;
+    -fx-border-color: -bordo;
     -fx-border-radius: 3px;
 }
 
 .progress-bar > .track {
-    -fx-background-color: -ombra;
+    -fx-background-color: -fondo;
     -fx-background-radius: 2px;
 }
 
-/* Il colore della barra racconta la situazione a colpo d'occhio, senza leggere i
-   numeri: in forze = edera, a meta' = lanterna, agli sgoccioli = torcia.
-   E' il controller a scegliere quale di queste classi applicare. */
+/* Il colore della barra racconta la situazione senza bisogno di leggere i numeri:
+   in forze = verde, a meta' = arancione, agli sgoccioli = rosso.
+   E' il controller a scegliere quale classe applicare, non la barra a saperlo. */
 .barra-vita > .bar {
-    -fx-background-color: -edera;
+    -fx-background-color: -vita-piena;
     -fx-background-insets: 1px;
     -fx-background-radius: 2px;
 }
 
 .barra-vita-media > .bar {
-    -fx-background-color: -lanterna;
+    -fx-background-color: -vita-media;
 }
 
 .barra-vita-bassa > .bar {
-    -fx-background-color: -torcia;
+    -fx-background-color: -vita-critica;
 }
 
 /* --- Diario del combattimento ---------------------------------------------- */
 
-/* Il racconto dei colpi, letto alla luce di una torcia: fondo d'ombra, testo chiaro. */
+/* Il racconto dei colpi: un riquadro di pietra scura, di sola lettura. */
 .diario {
-    -fx-font-family: "Consolas", monospace;
-    -fx-font-size: 12px;
-    -fx-control-inner-background: -ombra;
-    -fx-text-fill: -luna;
-    -fx-highlight-fill: -notte;
-    -fx-border-color: -pietra-lunare;
+    -fx-font-family: "Constantia", "Cambria", "Georgia", serif;
+    -fx-font-size: 13px;
+    -fx-control-inner-background: -fondo-diario;
+    -fx-text-fill: -pergamena;
+    -fx-highlight-fill: -bordo;
+    -fx-border-color: -bordo;
     -fx-border-radius: 3px;
 }
 
 .diario .content {
-    -fx-background-color: -ombra;
+    -fx-background-color: -fondo-diario;
 }
 
 .separator *.line {
-    -fx-border-color: -pietra-lunare;
+    -fx-border-color: -bordo;
     -fx-border-width: 1px 0 0 0;
 }
